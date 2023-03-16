@@ -1,6 +1,6 @@
 # RRBS_PE_Snakemake
 
-# TODO:
+## TODO:
 
 - Intial Data Exploration feature
 	1. Methylation statistics per sample\
