@@ -3,7 +3,7 @@
 ## TODO:
 
 - Intial Data Exploration feature
-	0. IDE Rule in Snakemake
+	0. IDE Rule in Snakemake\
 	1. Methylation statistics per sample\
 		a. Plots\
 		b. Tables
