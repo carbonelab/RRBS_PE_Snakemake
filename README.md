@@ -3,7 +3,6 @@
 ## TODO:
 
 - Intial Data Exploration feature
-	0. IDE Rule in Snakemake\
 	1. Methylation statistics per sample\
 		a. Plots\
 		b. Tables
@@ -15,5 +14,6 @@
 		b. Dendrogram\
 		c. PCA scree plot\
 		d. PCA scatter plot
+	4. IDE Rule in Snakemake\
 		 
 
