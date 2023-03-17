@@ -151,4 +151,6 @@ rule ide:
     params:
         outdir = "data/meth_extract/ide",
         inpath = "data/meth_extract/cov_files"
+    shell:
+        "Rscript methyKitIDE.r"
 
