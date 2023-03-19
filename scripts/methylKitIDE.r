@@ -126,10 +126,11 @@ if (opt$plots) {
     clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
     #close file
 
-    #cluster sample ploit
-    #PCA scree
+    #file name
     PCASamples(meth, screeplot=TRUE)
+    #close file
 
-    #PCA scatter plot
+    #file name
     PCASamples(meth)
+    #close file
 }
