@@ -111,13 +111,25 @@ if (topt$ables) {
 meth = unite(myObj, destrand=FALSE,c.cores=12)
 
 if (opt$tables) {
-    #correlation table
-    #cluster sample table
+    #file name
+    getCorrelation(meth, plot=FALSE)
+    #close file
+
+    #file name
+    clusterSamples(meth, dist="correlation", method="ward", plot=FALSE)
+    #close file
 }
 
 
 if (opt$plots) {
+    #file name
+    clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
+    #close file
+
     #cluster sample ploit
     #PCA scree
+    PCASamples(meth, screeplot=TRUE)
+
     #PCA scatter plot
+    PCASamples(meth)
 }
