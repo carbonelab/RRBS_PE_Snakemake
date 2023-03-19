@@ -77,23 +77,33 @@ myObj = methRead(sampleFiles,
 			mincov = opt$coverage) 
 
 if (opt$plots) {
-    #Loop over samples
-        #coverage plot
-            #create
-            #store
-        #methylation plot
-            #create
-            #store
+    for(i in myObj) {
+        pdf(paste0(getSampleID(i),"_methStats.pdf"))
+        getMethylationStats(i,plot=TRUE,both.strands=FALSE)
+        dev.off()
+
+        pdf(paste0(getSampleID(i),"_covStats.pdf"))
+        getCoverageStats(i,plot=TRUE,both.strands=FALSE)
+        dev.off()
+
+        # file.rename(from = "./methylationStats.pdf", to = paste0(outputDirectory, "methylationStats.pdf"))
+        # file.rename(from = "./coverageStats.pdf", to = paste0(outputDirectory, "coverageStats.pdf"))
+    }
 }
 
 if (topt$ables) {
-    #Loop over samples
-        #coverage table
-            #create
-            #store
-        #methylation table
-            #create
-            #store
+    for(i in myObj) {
+        pdf(paste0(getSampleID(i),"_methStats.txt"))
+        getMethylationStats(i,plot=FALSE,both.strands=FALSE)
+        dev.off()
+
+        pdf(paste0(getSampleID(i),"_covStats.txt"))
+        getCoverageStats(i,plot=FALSE,both.strands=FALSE)
+        dev.off()
+
+        # file.rename(from = "./coverageStats.pdf", to = paste0(outputDirectory, "coverageStats.pdf"))
+        # file.rename(from = "./methylationStats.pdf", to = paste0(outputDirectory, "methylationStats.pdf"))
+    }
 }
 
 #merge samples
