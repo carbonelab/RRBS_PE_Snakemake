@@ -76,7 +76,7 @@ myObj = methRead(sampleFiles,
 			pipeline = "bismarkCoverage",
 			mincov = opt$coverage) 
 
-if (opt$plots) {
+if (opt$plots or opt$all) {
     for(i in myObj) {
         pdf(paste0(getSampleID(i),"_methStats.pdf"))
         getMethylationStats(i,plot=TRUE,both.strands=FALSE)
@@ -91,7 +91,7 @@ if (opt$plots) {
     }
 }
 
-if (topt$ables) {
+if (topt$ables or opt$all) {
     for(i in myObj) {
         pdf(paste0(getSampleID(i),"_methStats.txt"))
         getMethylationStats(i,plot=FALSE,both.strands=FALSE)
@@ -112,7 +112,7 @@ myObj = filterByCoverage(myObj, lo.count=5, lo.perc=NULL, hi.count=NULL, hi.perc
 
 meth = unite(myObj, destrand=FALSE,c.cores=12)
 
-if (opt$tables) {
+if (opt$tables or opt$all) {
     #file name
     getCorrelation(meth, plot=FALSE)
     #close file
@@ -123,7 +123,7 @@ if (opt$tables) {
 }
 
 
-if (opt$plots) {
+if (opt$plots or opt$all) {
     #file name
     clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
     #close file
