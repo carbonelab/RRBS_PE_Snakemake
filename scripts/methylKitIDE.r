@@ -108,6 +108,8 @@ if (topt$ables) {
 
 #merge samples
 
+myObj = filterByCoverage(myObj, lo.count=5, lo.perc=NULL, hi.count=NULL, hi.perc=99.9)
+
 meth = unite(myObj, destrand=FALSE,c.cores=12)
 
 if (opt$tables) {
