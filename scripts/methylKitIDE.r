@@ -49,7 +49,7 @@ if(!length(inputFiles) > 1) {
 #create list of sample names from file names
 
 inputNames <- gsub("_val.*", "", inputFiles)
-inputNames <- gsub(paste0(inputDirectory,"/"), "", inputNames)
+inputNames <- gsub(paste0(opt$input,"/"), "", inputNames)
 
 sampleFiles <- lapply(inputFiles, function(x) x)
 sampleNames <- lapply(inputNames, function(x) x)
@@ -76,7 +76,7 @@ myObj = methRead(sampleFiles,
 			pipeline = "bismarkCoverage",
 			mincov = opt$coverage) 
 
-if (plots) {
+if (opt$plots) {
     #Loop over samples
         #coverage plot
             #create
@@ -86,7 +86,7 @@ if (plots) {
             #store
 }
 
-if (tables) {
+if (topt$ables) {
     #Loop over samples
         #coverage table
             #create
@@ -100,13 +100,13 @@ if (tables) {
 
 meth = unite(myObj, destrand=FALSE,c.cores=12)
 
-if (tables) {
+if (opt$tables) {
     #correlation table
     #cluster sample table
 }
 
 
-if (plots) {
+if (opt$plots) {
     #cluster sample ploit
     #PCA scree
     #PCA scatter plot
