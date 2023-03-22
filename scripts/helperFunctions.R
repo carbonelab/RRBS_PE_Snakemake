@@ -6,8 +6,46 @@
 # Load Libraries
 
 library(ggplot2)
+library("optparse")
 
 #-------------------------------------------------------------------------------------------#
+
+getOptionsList <- function() {
+  option_list = list(
+    make_option(c("-p", "--plots"), action="store_true", default="store_false", dest="plots", help="create plot output files"),
+    make_option(c("-t", "--tables"), action="store_true", default="store_false", dest="tables", help="create table output files"),
+    make_option(c("-a", "--all"), action="store_true", default="store_false", dest="all", help="create plot and table output files"),
+    make_option(c("-i", "--input"), type="character", default=NULL, help="input file directory", metavar="character"),
+    make_option(c("-o", "--output"), type="character", default=NULL, help="output file directory", metavar="character"),
+    make_option(c("-s", "--treatment"), type="character", default=NULL, help="treatement vector for input files", metavar="character"),
+    make_option(c("-c", "--coverage"), type="integer", default=NULL, help="minimum coverage amount", metavar="integer"),
+    make_option(c("-h", "--header"), action="store_true", default="store_true", dest="header", help="designate the whether the input files contain a header line")
+  ); 
+  return(option_list)
+}
+
+checkInputOptions <- function(opt) {
+  if(!file.exists(opt$input)) {
+	  print("input directory not found")
+	  quit()
+  }
+
+  if(!file.exists(opt$output)) {
+	  print("output directory not found, creating one now")
+	  dir.create(opt$output)
+  }
+
+  if(opt$plots == FALSE AND opt$tables == FALSE AND opt$all == FALSE) {
+    print("No data output specified")
+    quit()
+  }
+
+  temp <- list.files(opt$input, "*.cov.gz", full=T)
+  if(!length(temp) > 1) {
+    print("No input files found")
+    quit()
+  }
+}
 
 ############------------------------------------#
 # FUNCTION # to describe a prcomp result object #

@@ -1,6 +1,8 @@
 library(methylKit)
 #!/usr/bin/env Rscript
-library("optparse")
+#library("optparse")
+
+source("helperFunctions.R")
 
 #command line inputs
 #
@@ -12,30 +14,18 @@ library("optparse")
 # -s "c(1,1,0,0)"   : treatement??? #is this needed??
 # -c [1-100]        : minimum read coverage
 # -h [0,1]          : header line present on files?
-
-option_list = list(
-    make_option(c("-p", "--plots"), action="store_true", default="store_false", dest="plots", help="create plot output files"),
-    make_option(c("-t", "--tables"), action="store_true", default="store_false", dest="tables", help="create table output files"),
-    make_option(c("-a", "--all"), action="store_true", default="store_false", dest="all", help="create plot and table output files"),
-    make_option(c("-i", "--input"), type="character", default=NULL, help="input file directory", metavar="character"),
-    make_option(c("-o", "--output"), type="character", default=NULL, help="output file directory", metavar="character"),
-    make_option(c("-s", "--treatment"), type="character", default=NULL, help="treatement vector for input files", metavar="character"),
-    make_option(c("-c", "--coverage"), type="integer", default=NULL, help="minimum coverage amount", metavar="integer"),
-    make_option(c("-h", "--header"), action="store_true", default="store_true", dest="header", help="designate the whether the input files contain a header line")
-); 
  
-opt_parser = OptionParser(option_list=option_list);
+opt_parser = OptionParser(option_list=getOptionsList());
 opt = parse_args(opt_parser);
+
+checkInputOptions(opt)
 
 #check input directory exists
 #Enumerate list of input files
 
 #inputDirectory <- paste(getwd(), "/cov_files", sep="")
 #if(!file.exists(inputDirectory)) {
-if(!file.exists(opt$input)) {
-	print("input directory not found")
-	quit()
-}
+
 inputFiles <- list.files(opt$input, "*.cov.gz", full=T)
 if(!length(inputFiles) > 1) {
 	print("No input files found")
@@ -60,10 +50,6 @@ sampleNames <- lapply(inputNames, function(x) x)
 
 #outputDirectory <- paste(getwd(), "/output/", sep="")
 #if(!file.exists(outputDirectory)) {
-if(!file.exists(opt$output)) {
-	print("output directory not found, creating one now")
-	dir.create(opt$output)
-}
 
 #create data object
 #   include all input parameters as potential command line inputs
@@ -91,7 +77,7 @@ if (opt$plots or opt$all) {
     }
 }
 
-if (topt$ables or opt$all) {
+if (opt$tables or opt$all) {
     for(i in myObj) {
         pdf(paste0(getSampleID(i),"_methStats.txt"))
         getMethylationStats(i,plot=FALSE,both.strands=FALSE)
@@ -108,7 +94,7 @@ if (topt$ables or opt$all) {
 
 #merge samples
 
-myObj = filterByCoverage(myObj, lo.count=5, lo.perc=NULL, hi.count=NULL, hi.perc=99.9)
+#myObj = filterByCoverage(myObj, lo.count=5, lo.perc=NULL, hi.count=NULL, hi.perc=99.9)
 
 meth = unite(myObj, destrand=FALSE,c.cores=12)
 
