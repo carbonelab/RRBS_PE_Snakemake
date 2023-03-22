@@ -10,6 +10,17 @@ library("optparse")
 
 #-------------------------------------------------------------------------------------------#
 
+#command line inputs
+#
+# -p [0,1]          : output plots ?
+# -t [0,1]          : output tables ?
+# -a [0,1]          : all plots/tables or just merged plots/tables
+# -i [directory]    : input directory
+# -o [directory]    : output directory
+# -s "c(1,1,0,0)"   : treatement??? #is this needed??
+# -c [1-100]        : minimum read coverage
+# -h [0,1]          : header line present on files?
+
 getOptionsList <- function() {
   option_list = list(
     make_option(c("-p", "--plots"), action="store_true", default="store_false", dest="plots", help="create plot output files"),
@@ -22,6 +33,20 @@ getOptionsList <- function() {
     make_option(c("-h", "--header"), action="store_true", default="store_true", dest="header", help="designate the whether the input files contain a header line")
   ); 
   return(option_list)
+}
+
+getSampleFiles <- function(inputDirectory) {
+  inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
+  inputNames <- gsub("_val.*", "", inputFiles)
+  inputNames <- gsub(paste0(inputDirectory,"/"), "", inputNames)
+  return(lapply(inputFiles, function(x) x))
+}
+
+getSampleNames <- function(inputDirectory) {
+  inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
+  inputNames <- gsub("_val.*", "", inputFiles)
+  inputNames <- gsub(paste0(inputDirectory,"/"), "", inputNames)
+  return(lapply(inputNames, function(x) x))
 }
 
 checkInputOptions <- function(opt) {
