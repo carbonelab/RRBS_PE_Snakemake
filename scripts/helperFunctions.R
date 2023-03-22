@@ -35,6 +35,69 @@ getOptionsList <- function() {
   return(option_list)
 }
 
+getMethPlots <- function(myObj, outputDirectory) {
+
+  dir.create(file.path(outputDirectory, "meth_stats_plots"), showWarnings = FALSE)
+  setwd(file.path(outputDirectory, "meth_stats_plots"))
+
+  for (i in myObj) {
+      pdf(paste0(getSampleID(i),"_methstats.pdf"))
+      getMethylationStats(i, plot=TRUE, both.strands=FALSE)
+      dev.off()
+  }
+  setwd(outputDirectory)
+}
+
+getCovPlots <- function(myObj, outputDirectory) {
+
+  dir.create(file.path(outputDirectory, "cov_stats_plots"), showWarnings = FALSE)
+  setwd(file.path(outputDirectory, "cov_stats_plots"))
+
+  for (i in myObj) {
+      pdf(paste0(getSampleID(i),"_covstats.pdf"))
+      getMethylationStats(i, plot=TRUE, both.strands=FALSE)
+      dev.off()
+  }
+  setwd(outputDirectory)
+}
+
+getMethStats <- function(myObj, outputDirectory) {
+
+  dir.create(file.path(outputDirectory, "meth_stats"), showWarnings = FALSE)
+  setwd(file.path(outputDirectory, "meth_stats"))
+
+  for (i in myObj) {
+      pdf(paste0(getSampleID(i),"_methstats.txt"))
+      getMethylationStats(i, plot=FALSE, both.strands=FALSE)
+      dev.off()
+  }
+  setwd(outputDirectory)
+}
+
+getCovStats <- function(myObj, outputDirectory) {
+
+  dir.create(file.path(outputDirectory, "cov_stats"), showWarnings = FALSE)
+  setwd(file.path(outputDirectory, "cov_stats"))
+
+  for (i in myObj) {
+      pdf(paste0(getSampleID(i),"_covstats.txt"))
+      getMethylationStats(i, plot=FALSE, both.strands=FALSE)
+      dev.off()
+  }
+  setwd(outputDirectory)
+}
+
+getObject <- function(opt, sampleFiles, sampleNames) {
+  myObj <- methRead(sampleFiles,
+                    sample.id=sampleNames,
+                    assembly="genome",
+                    treatment=opt$treatement,
+                    pipeline="bismarkCoverage",
+                    context="CpG",
+                    mincov=opt$coverage)
+  return(myObj)
+}
+
 getSampleFiles <- function(inputDirectory) {
   inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
   inputNames <- gsub("_val.*", "", inputFiles)
@@ -54,6 +117,8 @@ checkInputOptions <- function(opt) {
 	  print("input directory not found")
 	  quit()
   }
+
+  #if(opt$treatment)
 
   if(!file.exists(opt$output)) {
 	  print("output directory not found, creating one now")

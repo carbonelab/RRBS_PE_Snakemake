@@ -14,13 +14,13 @@ sampleNames <- getSampleNames(opt$input)
 myObj <- getObject(opt, sampleFiles, sampleNames)
 
 if (opt$plots or opt$all) {
-    makeMethPlots(myObj) #this function must be made
-    makeCovPlots(myObj)
+    getMethPlots(myObj, opt$output) #this function must be made
+    getCovPlots(myObj, opt$output)
 }
 
 if (opt$tables or opt$all) {
-    makeMethStats(myObj)
-    makeCovStats(myObj)
+    getMethStats(myObj, opt$output)
+    getCovStats(myObj, opt$output)
 }
 
 #merge samples
