@@ -11,13 +11,7 @@ checkInputOptions(opt)
 sampleFiles <- getSampleFiles(opt$input)
 sampleNames <- getSampleNames(opt$input)
 
-myObj = methRead(sampleFiles,
-		   	sample.id = sampleNames,
-			header = opt$header,
-			assembly = "genome",
-			treatment = opt$treatment,
-			pipeline = "bismarkCoverage",
-			mincov = opt$coverage) 
+myObj <- getObject(opt, sampleFiles, sampleNames)
 
 if (opt$plots or opt$all) {
     makeMethPlots(myObj) #this function must be made
@@ -36,26 +30,12 @@ if (opt$tables or opt$all) {
 meth = unite(myObj, destrand=FALSE,c.cores=12)
 
 if (opt$tables or opt$all) {
-    #file name
     getCorrelation(meth, plot=FALSE)
-    #close file
-
-    #file name
     clusterSamples(meth, dist="correlation", method="ward", plot=FALSE)
-    #close file
 }
 
-
 if (opt$plots or opt$all) {
-    #file name
     clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
-    #close file
-
-    #file name
     PCASamples(meth, screeplot=TRUE)
-    #close file
-
-    #file name
     PCASamples(meth)
-    #close file
 }
