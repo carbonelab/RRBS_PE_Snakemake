@@ -20,22 +20,11 @@ opt = parse_args(opt_parser);
 
 checkInputOptions(opt)
 
-#check input directory exists
 #Enumerate list of input files
 
-#inputDirectory <- paste(getwd(), "/cov_files", sep="")
-#if(!file.exists(inputDirectory)) {
-
 inputFiles <- list.files(opt$input, "*.cov.gz", full=T)
-if(!length(inputFiles) > 1) {
-	print("No input files found")
-	quit()
-}
 
-#check if input files are present
-#check if input files are accessible?
 #store input file names
-
 #create list of sample names from file names
 
 inputNames <- gsub("_val.*", "", inputFiles)
@@ -43,13 +32,6 @@ inputNames <- gsub(paste0(opt$input,"/"), "", inputNames)
 
 sampleFiles <- lapply(inputFiles, function(x) x)
 sampleNames <- lapply(inputNames, function(x) x)
-
-
-#check if output directory exists
-#create if not
-
-#outputDirectory <- paste(getwd(), "/output/", sep="")
-#if(!file.exists(outputDirectory)) {
 
 #create data object
 #   include all input parameters as potential command line inputs
