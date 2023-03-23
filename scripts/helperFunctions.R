@@ -49,13 +49,15 @@ getOptionsList <- function() {
     make_option(c("-p", "--plots"), action="store_true", default="store_false", dest="plots", help="create plot output files"),
     make_option(c("-t", "--tables"), action="store_true", default="store_false", dest="tables", help="create table output files"),
     make_option(c("-a", "--all"), action="store_true", default="store_false", dest="all", help="create plot and table output files"),
-    make_option(c("-i", "--input"), type="character", default=NULL, help="input file directory", metavar="character"),
-    make_option(c("-o", "--output"), type="character", default=NULL, help="output file directory", metavar="character"),
-    make_option(c("-s", "--treatment"), type="character", default=NULL, help="treatement vector for input files", metavar="character"),
+ #   make_option(c("-i", "--input"), type="character", default=NULL, help="input file directory", metavar="character"),
+ #   make_option(c("-o", "--output"), type="character", default=NULL, help="output file directory", metavar="character"),
+ #directories hardcoded in SnakeMake file 
+ #^^^^   make_option(c("-s", "--treatment"), type="character", default=NULL, help="treatement vector for input files", metavar="character"),
     make_option(c("-c", "--coverage"), type="integer", default=NULL, help="minimum coverage amount", metavar="integer"),
     make_option(c("-h", "--header"), action="store_true", default="store_true", dest="header", help="designate the whether the input files contain a header line"),
-    make_option(c("-r", "--regional"), action="store_true", default="store_false", dest="regional", help="specify whether or not the data should be tiled"),
-    make_option(c("-n", "--normalize"), action="store_true", default="store_false", dest="normalize", help="specify whether or not to normalize coverage after filtering"),
+#  make_option(c("-r", "--regional"), action="store_true", default="store_false", dest="regional", help="specify whether or not the data should be tiled"),
+#  make_option(c("-n", "--normalize"), action="store_true", default="store_false", dest="normalize", help="specify whether or not to normalize coverage after filtering"),
+
     make_option(c("-m", "--processors"), action="store_true", default="store_false", dest="processors", help="specofy the number of processors to utilize in available functions")
   ); 
   return(option_list)
@@ -137,7 +139,7 @@ getCovPlots <- function(myObj, outputDirectory) {
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # Outputs methylation stats for all samples #
 ############------------------------------------#
 
 getMethStats <- function(myObj, outputDirectory) {
@@ -154,7 +156,7 @@ getMethStats <- function(myObj, outputDirectory) {
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # Outputs coverage statistics for all samples #
 ############------------------------------------#
 
 getCovStats <- function(myObj, outputDirectory) {
@@ -171,7 +173,7 @@ getCovStats <- function(myObj, outputDirectory) {
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # Returns data object #
 ############------------------------------------#
 
 getObject <- function(opt, sampleFiles, sampleNames) {
@@ -186,18 +188,16 @@ getObject <- function(opt, sampleFiles, sampleNames) {
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # Returns file names with full directory location #
 ############------------------------------------#
 
 getSampleFiles <- function(inputDirectory) {
   inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
-  inputNames <- gsub("_val.*", "", inputFiles)
-  inputNames <- gsub(paste0(inputDirectory,"/"), "", inputNames)
   return(lapply(inputFiles, function(x) x))
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # Returns file names without file extentsions or locations #
 ############------------------------------------#
 
 getSampleNames <- function(inputDirectory) {
@@ -208,7 +208,7 @@ getSampleNames <- function(inputDirectory) {
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # validates input parameters #
 ############------------------------------------#
 
 checkInputOptions <- function(opt) {
