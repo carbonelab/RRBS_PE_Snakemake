@@ -19,9 +19,12 @@ rule all:
         "data/fastqc/raw/fqc_stats.table.txt",
         "data/trimming/trimgalore_stats.txt",
         "data/bismark_aln/bismark_stats.txt",
-        expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES)
-        #output files for IDE script 
-
+        expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
+        expand("data/ide/{sample}_percentMeth.pdf", sample = SAMPLES),
+        expand("data/ide/{sample}_percentCov.pdf", sample = SAMPLES),
+        "data/ide/clusteringDendro.pdf",
+        "data/ide/pcaScree.pdf",
+        "data/ide/pcaScatter.pdf"
 
 rule fastqc_raw:
     input:
