@@ -3,12 +3,32 @@
 
 #------------------------------------------------------------------------------------#
 
+# Functions:
+
+# getOptionsList        Returns list of command line options
+# getMergedRegions      Returns object of merged dataset
+# getCovStats           Outputs coverage statistics for all samples
+# getCovPlots           Outputs coverage plots for all samples
+# getMethPlots          Outputs methylation plots for all samples
+# getMethStats          Outputs methylation stats for all samples
+# getObject             Returns data object 
+# getSampleFiles        Returns file names with full directory location 
+# getSampleNames        Returns file names without file extentsions or locations
+# checkInputOptions     Validates input parameters 
+# describe_pca            
+# plot_pca
+
+
+
+#------------------------------------------------------------------------------------#
+
 # Load Libraries
 
 library(ggplot2)
 library("optparse")
 
-#-------------------------------------------------------------------------------------------#
+#------------------------------------------------------------------------------------#
+
 
 #command line inputs
 #
