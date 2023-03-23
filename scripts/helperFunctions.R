@@ -38,8 +38,41 @@ getOptionsList <- function() {
   return(option_list)
 }
 
-getMergedRegions <- function(myObj, opt) {
+getMergedRegions <- function(myObj, opt) {#myObj=myObj, min=10, max=99.9, normalize=TRUE, regional=TRUE, tile_size=1000, step_size=1000, min_cpg=10, mpg=NULL, destrand=FALSE
   
+  myObj.filtered <- filterByCoverage(myObj, lo.count=10, lo.perc=NULL, hi.count=NULL, hi.perc=99.9)
+
+  if (opt$normalize) {
+    myObj.filtered <- normalizeCoverage(myObj.filtered, method="median")
+  }
+
+  if (opt$regional) {
+    my.tiles <- tileMethylCounts(myObj.filtered,
+                                 win.size=1000,
+                                 step.size=1000,
+                                 cov.bases=10,
+                                 mc.cores=opt$processors
+    )
+    for (i in 1:length(my.tiles)) {
+      print(nrow(my.tiles[[i]]))
+    }
+    # merge the tiles
+    print("Merging tiled regions across samples.")
+    meth <- methylKit::unite(my.tiles, min.per.group=NULL, mc.cores=opt$processors)
+    print(paste0("Returning ", nrow(meth), " regions."))
+
+    return(meth)
+  }
+
+  # if not regional, just merge cpgs with no tiling
+  else {
+    print("merging CpGs")
+    meth <- methylKit::unite(myObj.filtered,
+                  min.per.group=NULL,
+                  destrand=FALSE)
+    print(paste0("Returning ", nrow(meth), " CpGs."))
+    return(meth)
+  }
 }
 
 getMethPlots <- function(myObj, outputDirectory) {

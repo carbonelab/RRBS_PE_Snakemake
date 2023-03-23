@@ -8,10 +8,10 @@ opt = parse_args(opt_parser);
 
 checkInputOptions(opt)
 
-sampleFiles = getSampleFiles(opt$input)
-sampleNames = getSampleNames(opt$input)
+sampleFiles <- getSampleFiles(opt$input)
+sampleNames <- getSampleNames(opt$input)
 
-myObj = getObject(opt, sampleFiles, sampleNames)
+myObj <- getObject(opt, sampleFiles, sampleNames)
 
 if (opt$plots or opt$all) {
     getMethPlots(myObj, opt$output) #this function must be made
