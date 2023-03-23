@@ -7,9 +7,9 @@
 
 # getOptionsList        Returns list of command line options
 # getMergedRegions      Returns object of merged dataset
-# getCovStats           Outputs coverage statistics for all samples
 # getCovPlots           Outputs coverage plots for all samples
 # getMethPlots          Outputs methylation plots for all samples
+# getCovStats           Outputs coverage statistics for all samples
 # getMethStats          Outputs methylation stats for all samples
 # getObject             Returns data object 
 # getSampleFiles        Returns file names with full directory location 
@@ -29,6 +29,9 @@ library("optparse")
 
 #------------------------------------------------------------------------------------#
 
+############------------------------------------#
+# FUNCTION # Returns list of command line options #
+############------------------------------------#
 
 #command line inputs
 #
@@ -58,8 +61,12 @@ getOptionsList <- function() {
   return(option_list)
 }
 
-getMergedRegions <- function(myObj, opt) {#myObj=myObj, min=10, max=99.9, normalize=TRUE, regional=TRUE, tile_size=1000, step_size=1000, min_cpg=10, mpg=NULL, destrand=FALSE
-  
+############------------------------------------#
+# FUNCTION # Returns object of merged dataset #
+############------------------------------------#
+
+getMergedRegions <- function(myObj, opt) {
+
   myObj.filtered <- filterByCoverage(myObj, lo.count=10, lo.perc=NULL, hi.count=NULL, hi.perc=99.9)
 
   if (opt$normalize) {
@@ -95,6 +102,10 @@ getMergedRegions <- function(myObj, opt) {#myObj=myObj, min=10, max=99.9, normal
   }
 }
 
+############------------------------------------#
+# FUNCTION # Outputs methylation plots for all samples #
+############------------------------------------#
+
 getMethPlots <- function(myObj, outputDirectory) {
 
   dir.create(file.path(outputDirectory, "meth_stats_plots"), showWarnings = FALSE)
@@ -107,6 +118,10 @@ getMethPlots <- function(myObj, outputDirectory) {
   }
   setwd(outputDirectory)
 }
+
+############------------------------------------#
+# FUNCTION # Outputs coverage plots for all samples #
+############------------------------------------#
 
 getCovPlots <- function(myObj, outputDirectory) {
 
@@ -121,6 +136,10 @@ getCovPlots <- function(myObj, outputDirectory) {
   setwd(outputDirectory)
 }
 
+############------------------------------------#
+# FUNCTION # to describe a prcomp result object #
+############------------------------------------#
+
 getMethStats <- function(myObj, outputDirectory) {
 
   dir.create(file.path(outputDirectory, "meth_stats"), showWarnings = FALSE)
@@ -133,6 +152,10 @@ getMethStats <- function(myObj, outputDirectory) {
   }
   setwd(outputDirectory)
 }
+
+############------------------------------------#
+# FUNCTION # to describe a prcomp result object #
+############------------------------------------#
 
 getCovStats <- function(myObj, outputDirectory) {
 
@@ -147,6 +170,10 @@ getCovStats <- function(myObj, outputDirectory) {
   setwd(outputDirectory)
 }
 
+############------------------------------------#
+# FUNCTION # to describe a prcomp result object #
+############------------------------------------#
+
 getObject <- function(opt, sampleFiles, sampleNames) {
   myObj <- methRead(sampleFiles,
                     sample.id=sampleNames,
@@ -158,6 +185,10 @@ getObject <- function(opt, sampleFiles, sampleNames) {
   return(myObj)
 }
 
+############------------------------------------#
+# FUNCTION # to describe a prcomp result object #
+############------------------------------------#
+
 getSampleFiles <- function(inputDirectory) {
   inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
   inputNames <- gsub("_val.*", "", inputFiles)
@@ -165,12 +196,20 @@ getSampleFiles <- function(inputDirectory) {
   return(lapply(inputFiles, function(x) x))
 }
 
+############------------------------------------#
+# FUNCTION # to describe a prcomp result object #
+############------------------------------------#
+
 getSampleNames <- function(inputDirectory) {
   inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
   inputNames <- gsub("_val.*", "", inputFiles)
   inputNames <- gsub(paste0(inputDirectory,"/"), "", inputNames)
   return(lapply(inputNames, function(x) x))
 }
+
+############------------------------------------#
+# FUNCTION # to describe a prcomp result object #
+############------------------------------------#
 
 checkInputOptions <- function(opt) {
   if(!file.exists(opt$input)) {
