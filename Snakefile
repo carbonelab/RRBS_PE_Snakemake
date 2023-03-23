@@ -20,7 +20,7 @@ rule all:
         "data/trimming/trimgalore_stats.txt",
         "data/bismark_aln/bismark_stats.txt",
         expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES)
-        
+        #output files for IDE script 
 
 
 rule fastqc_raw:
@@ -134,23 +134,22 @@ rule meth_extract:
     shell:
         "bismark_methylation_extractor -p --comprehensive --merge_non_CpG --bedGraph --cytosine_report --gzip --genome_folder {params.genome_dir} -o {params.outdir} {input.bam}" 
 
-# rule ide:
-#     input:
-#         cov = "data/meth_extract/cov_files/{sample}__val_1_bismark_bt2_pe.bismark.cov.gz"
-#         #more?
-#     output:
-#         "data/meth_extract/ide/{sample}_percentMeth.pdf",
-#         "data/meth_extract/ide/{sample}_percentCov.pdf",
-#         #"data/meth_extract/ide/correlationScatter.pdf", #NEED?
-#         "data/meth_extract/ide/clusteringDendro.pdf",
-#         "data/meth_extract/ide/pcaScree.pdf",
-#         "data/meth_extract/ide/pcaScatter.pdf"
-#         #create this directory for plot outputs
-#     conda 
-#         "envs/methylKit.yaml"
-#     params:
-#         outdir = "data/meth_extract/ide",
-#         inpath = "data/meth_extract/cov_files"
-#     shell:
-#         "Rscript methyKitIDE.r"
+rule ide:
+    input:
+        cov = "data/meth_extract/cov_files/{sample}__val_1_bismark_bt2_pe.bismark.cov.gz"
+        #more?
+    output:
+        "data/ide/{sample}_percentMeth.pdf",
+        "data/ide/{sample}_percentCov.pdf",
+        "data/ide/clusteringDendro.pdf",
+        "data/ide/pcaScree.pdf",
+        "data/ide/pcaScatter.pdf"
+        #create this directory for plot outputs
+    conda:
+        "envs/methylKit.yaml"
+    params:
+        outdir = "data/ide",
+        inpath = "data/meth_extract/cov_files"
+    shell:
+        "Rscript methyKitIDE.R"
 
