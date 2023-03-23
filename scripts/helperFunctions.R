@@ -30,9 +30,16 @@ getOptionsList <- function() {
     make_option(c("-o", "--output"), type="character", default=NULL, help="output file directory", metavar="character"),
     make_option(c("-s", "--treatment"), type="character", default=NULL, help="treatement vector for input files", metavar="character"),
     make_option(c("-c", "--coverage"), type="integer", default=NULL, help="minimum coverage amount", metavar="integer"),
-    make_option(c("-h", "--header"), action="store_true", default="store_true", dest="header", help="designate the whether the input files contain a header line")
+    make_option(c("-h", "--header"), action="store_true", default="store_true", dest="header", help="designate the whether the input files contain a header line"),
+    make_option(c("-r", "--regional"), action="store_true", default="store_false", dest="regional", help="specify whether or not the data should be tiled"),
+    make_option(c("-n", "--normalize"), action="store_true", default="store_false", dest="normalize", help="specify whether or not to normalize coverage after filtering"),
+    make_option(c("-m", "--processors"), action="store_true", default="store_false", dest="processors", help="specofy the number of processors to utilize in available functions")
   ); 
   return(option_list)
+}
+
+getMergedRegions <- function(myObj, opt) {
+  
 }
 
 getMethPlots <- function(myObj, outputDirectory) {
