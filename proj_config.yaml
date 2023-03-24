@@ -6,3 +6,27 @@ gtf_file:
 bismark_ref_genome:
   /home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly
 
+
+################################
+
+#      IDE Configuration       #
+
+################################
+
+minimum_coverage:
+  10
+
+header_present:
+  0
+
+processors:
+  8
+
+plots:
+  0
+
+tables:
+  0
+
+all:
+  1
