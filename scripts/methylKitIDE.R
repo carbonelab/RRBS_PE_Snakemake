@@ -3,32 +3,44 @@
 library(methylKit)
 source("helperFunctions.R")
  
-opt_parser = OptionParser(option_list=getOptionsList());
-opt = parse_args(opt_parser);
+#executionConfiguration_parser = executionConfigurationionParser(executionConfigurationion_list=getexecutionConfigurationionsList());
+#executionConfiguration = parse_args(executionConfiguration_parser);
 
-checkInputOptions(opt)
+args = commandArgs(trailingOnly=TRUE)
+checkInputs(args)
 
-sampleFiles <- getSampleFiles(opt$input)
-sampleNames <- getSampleNames(opt$input)
+#get sample information
+samples <- read.csv("data/samples.info", header=TRUE)
 
-myObj <- getObject(opt, sampleFiles, sampleNames)
+#if all files found, return list in same order as sample.info file
+sampleFiles <- getSampleFiles(samples, args[1])
 
-if (opt$plots or opt$all) {
-    getMethPlots(myObj, opt$output) #this function must be made
-    getCovPlots(myObj, opt$output)
+treatment <- getTreatmentVector(samples)
+
+#get configuration settings
+executionConfiguration <- read_yaml("proj_config.yaml")
+
+# sampleFiles <- getSampleFiles(args[1])
+# sampleNames <- getSampleNames(args[1])
+
+myObj <- getObject(treatement, sampleFiles, samples$Sample,executionConfiguration$minimum_coverage)
+
+if (executionConfiguration$plots or executionConfiguration$all) {
+    getMethPlots(myObj, args[2]) #this function must be made
+    getCovPlots(myObj, args[2])
 }
-if (opt$tables or opt$all) {
-    getMethStats(myObj, opt$output)
-    getCovStats(myObj, opt$output)
+if (executionConfiguration$tables or executionConfiguration$all) {
+    getMethStats(myObj, args[2])
+    getCovStats(myObj, args[2])
 }
 
-meth = getMergedRegions(myObj, opt)
+meth = getMergedRegions(myObj, executionConfiguration)
 
-if (opt$tables or opt$all) {
+if (executionConfiguration$tables or executionConfiguration$all) {
     getCorrelation(meth, plot=FALSE)
     clusterSamples(meth, dist="correlation", method="ward", plot=FALSE)
 }
-if (opt$plots or opt$all) {
+if (executionConfiguration$plots or executionConfiguration$all) {
     clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
     PCASamples(meth, screeplot=TRUE)
     PCASamples(meth)

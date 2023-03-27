@@ -5,7 +5,6 @@
 
 # Functions:
 
-# getOptionsList        Returns list of command line options
 # getMergedRegions      Returns object of merged dataset
 # getCovPlots           Outputs coverage plots for all samples
 # getMethPlots          Outputs methylation plots for all samples
@@ -14,7 +13,7 @@
 # getObject             Returns data object 
 # getSampleFiles        Returns file names with full directory location 
 # getSampleNames        Returns file names without file extentsions or locations
-# checkInputOptions     Validates input parameters 
+# checkInputexecutionConfigurationions     Validates input parameters
 # describe_pca            
 # plot_pca
 
@@ -25,83 +24,48 @@
 # Load Libraries
 
 library(ggplot2)
-library("optparse")
 
 #------------------------------------------------------------------------------------#
-
-############------------------------------------#
-# FUNCTION # Returns list of command line options #
-############------------------------------------#
-
-#command line inputs
-#
-# -p [0,1]          : output plots ?
-# -t [0,1]          : output tables ?
-# -a [0,1]          : all plots/tables or just merged plots/tables
-# -i [directory]    : input directory
-# -o [directory]    : output directory
-# -s "c(1,1,0,0)"   : treatement??? #is this needed??
-# -c [1-100]        : minimum read coverage
-# -h [0,1]          : header line present on files?
-
-getOptionsList <- function() {
-  option_list = list(
-    make_option(c("-p", "--plots"), action="store_true", default="store_false", dest="plots", help="create plot output files"),
-    make_option(c("-t", "--tables"), action="store_true", default="store_false", dest="tables", help="create table output files"),
-    make_option(c("-a", "--all"), action="store_true", default="store_false", dest="all", help="create plot and table output files"),
- #   make_option(c("-i", "--input"), type="character", default=NULL, help="input file directory", metavar="character"),
- #   make_option(c("-o", "--output"), type="character", default=NULL, help="output file directory", metavar="character"),
- #directories hardcoded in SnakeMake file 
- #^^^^   make_option(c("-s", "--treatment"), type="character", default=NULL, help="treatement vector for input files", metavar="character"),
-    make_option(c("-c", "--coverage"), type="integer", default=NULL, help="minimum coverage amount", metavar="integer"),
-    make_option(c("-h", "--header"), action="store_true", default="store_true", dest="header", help="designate the whether the input files contain a header line"),
-#  make_option(c("-r", "--regional"), action="store_true", default="store_false", dest="regional", help="specify whether or not the data should be tiled"),
-#  make_option(c("-n", "--normalize"), action="store_true", default="store_false", dest="normalize", help="specify whether or not to normalize coverage after filtering"),
-
-    make_option(c("-m", "--processors"), action="store_true", default="store_false", dest="processors", help="specofy the number of processors to utilize in available functions")
-  ); 
-  return(option_list)
-}
 
 ############------------------------------------#
 # FUNCTION # Returns object of merged dataset #
 ############------------------------------------#
 
-getMergedRegions <- function(myObj, opt) {
+getMergedRegions <- function(myObj, executionConfiguration) {
 
   myObj.filtered <- filterByCoverage(myObj, lo.count=10, lo.perc=NULL, hi.count=NULL, hi.perc=99.9)
 
-  if (opt$normalize) {
+  #if (executionConfiguration$normalize) {
     myObj.filtered <- normalizeCoverage(myObj.filtered, method="median")
-  }
+  #}
 
-  if (opt$regional) {
+  #if (executionConfiguration$regional) {
     my.tiles <- tileMethylCounts(myObj.filtered,
                                  win.size=1000,
                                  step.size=1000,
                                  cov.bases=10,
-                                 mc.cores=opt$processors
+                                 mc.cores=executionConfiguration$processors
     )
     for (i in 1:length(my.tiles)) {
       print(nrow(my.tiles[[i]]))
     }
     # merge the tiles
     print("Merging tiled regions across samples.")
-    meth <- methylKit::unite(my.tiles, min.per.group=NULL, mc.cores=opt$processors)
+    meth <- methylKit::unite(my.tiles, min.per.group=NULL, mc.cores=executionConfiguration$processors)
     print(paste0("Returning ", nrow(meth), " regions."))
 
     return(meth)
-  }
+  #}
 
   # if not regional, just merge cpgs with no tiling
-  else {
-    print("merging CpGs")
-    meth <- methylKit::unite(myObj.filtered,
-                  min.per.group=NULL,
-                  destrand=FALSE)
-    print(paste0("Returning ", nrow(meth), " CpGs."))
-    return(meth)
-  }
+  # else {
+  #   print("merging CpGs")
+  #   meth <- methylKit::unite(myObj.filtered,
+  #                 min.per.group=NULL,
+  #                 destrand=FALSE)
+  #   print(paste0("Returning ", nrow(meth), " CpGs."))
+  #   return(meth)
+  # }
 }
 
 ############------------------------------------#
@@ -176,60 +140,83 @@ getCovStats <- function(myObj, outputDirectory) {
 # FUNCTION # Returns data object #
 ############------------------------------------#
 
-getObject <- function(opt, sampleFiles, sampleNames) {
+getObject <- function(treatement, sampleFiles, sampleNames, minimumCoverage) {
   myObj <- methRead(sampleFiles,
                     sample.id=sampleNames,
                     assembly="genome",
-                    treatment=opt$treatement,
+                    treatment=treatement,
                     pipeline="bismarkCoverage",
                     context="CpG",
-                    mincov=opt$coverage)
+                    mincov=minimumCoverage)
   return(myObj)
 }
 
-############------------------------------------#
-# FUNCTION # Returns file names with full directory location #
-############------------------------------------#
+# ############------------------------------------#
+# # FUNCTION # Returns file names with full directory location #
+# ############------------------------------------#
 
-getSampleFiles <- function(inputDirectory) {
-  inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
-  return(lapply(inputFiles, function(x) x))
+# getSampleFiles <- function(inputDirectory) {
+#   inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
+#   return(lapply(inputFiles, function(x) x))
+# }
+
+# ############------------------------------------#
+# # FUNCTION # Returns file names without file extentsions or locations #
+# ############------------------------------------#
+
+# getSampleNames <- function(inputDirectory) {
+#   inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
+#   inputNames <- gsub("_val.*", "", inputFiles)
+#   inputNames <- gsub(paste0(inputDirectory,"/"), "", inputNames)
+#   return(lapply(inputNames, function(x) x))
+# }
+
+getTreatmentVector <- function(samples) {
+  treatment = list()
+  for (i in samples$group) {
+    append(treatement, i) 
+  }
+  return treatement
 }
 
-############------------------------------------#
-# FUNCTION # Returns file names without file extentsions or locations #
-############------------------------------------#
-
-getSampleNames <- function(inputDirectory) {
-  inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
-  inputNames <- gsub("_val.*", "", inputFiles)
-  inputNames <- gsub(paste0(inputDirectory,"/"), "", inputNames)
-  return(lapply(inputNames, function(x) x))
+getSampleFiles <- function(samples, inputDirectory) {
+  files = list()
+  for(i in samples$Sample) {
+    temp <- paste0(inputDirectory,i)
+    temp <- paste0(temp,"__val_1_bismark_bt2_pe.bismark.cov.gz")
+    if(!file.exists(temp)) {
+        print("Sample file not found")
+        quit()
+    } else {
+      append(files,temp)
+    }
+  }
+  return files
 }
 
 ############------------------------------------#
 # FUNCTION # validates input parameters #
 ############------------------------------------#
 
-checkInputOptions <- function(opt) {
-  if(!file.exists(opt$input)) {
-	  print("input directory not found")
-	  quit()
-  }
+checkInputs <- function() {
+  # if(!file.exists("")) {
+	#   print("input directory not found")
+	#   quit()
+  # }
 
-  #if(opt$treatment)
+  #if(executionConfiguration$treatment)
 
-  if(!file.exists(opt$output)) {
+  if(!file.exists(executionConfiguration$output)) {
 	  print("output directory not found, creating one now")
-	  dir.create(opt$output)
+	  dir.create(executionConfiguration$output)
   }
 
-  if(opt$plots == FALSE AND opt$tables == FALSE AND opt$all == FALSE) {
+  if(executionConfiguration$plots == FALSE AND executionConfiguration$tables == FALSE AND executionConfiguration$all == FALSE) {
     print("No data output specified")
     quit()
   }
 
-  temp <- list.files(opt$input, "*.cov.gz", full=T)
+  temp <- list.files(executionConfiguration$input, "*.cov.gz", full=T)
   if(!length(temp) > 1) {
     print("No input files found")
     quit()
