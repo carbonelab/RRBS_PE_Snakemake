@@ -1,4 +1,3 @@
-
 # Snakefile to analyze RRBS PE data
 # 
 
@@ -140,19 +139,17 @@ rule meth_extract:
 rule ide:
     input:
         cov = "data/meth_extract/cov_files/{sample}__val_1_bismark_bt2_pe.bismark.cov.gz"
-        #more?
     output:
         "data/ide/{sample}_percentMeth.pdf",
         "data/ide/{sample}_percentCov.pdf",
         "data/ide/clusteringDendro.pdf",
         "data/ide/pcaScree.pdf",
         "data/ide/pcaScatter.pdf"
-        #create this directory for plot outputs
     conda:
         "envs/methylKit.yaml"
     params:
         outdir = "data/ide",
         inpath = "data/meth_extract/cov_files"
     shell:
-        "Rscript methyKitIDE.R"
+        "Rscript methyKitIDE.R {params.inpath} {params.outdir}"
 
