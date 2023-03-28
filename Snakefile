@@ -137,19 +137,21 @@ rule meth_extract:
         "bismark_methylation_extractor -p --comprehensive --merge_non_CpG --bedGraph --cytosine_report --gzip --genome_folder {params.genome_dir} -o {params.outdir} {input.bam}" 
 
 rule ide:
-    input:
-        cov = "data/meth_extract/cov_files/{sample}__val_1_bismark_bt2_pe.bismark.cov.gz"
+    # input:
+    #     cov = "data/meth_extract/cov_files/{sample}__val_1_bismark_bt2_pe.bismark.cov.gz"
     output:
-        "data/ide/{sample}_percentMeth.pdf",
-        "data/ide/{sample}_percentCov.pdf",
+        # "data/ide/{sample}_percentMeth.pdf",
+        # "data/ide/{sample}_percentCov.pdf",
+        expand("data/ide/{sample}_percentMeth.pdf", sample = SAMPLES),
+        expand("data/ide/{sample}_percentCov.pdf", sample = SAMPLES),
         "data/ide/clusteringDendro.pdf",
         "data/ide/pcaScree.pdf",
         "data/ide/pcaScatter.pdf"
     conda:
         "envs/methylKit.yaml"
     params:
-        outdir = "data/ide",
-        inpath = "data/meth_extract/cov_files"
+        outdir = "data/ide/",
+        inpath = "data/meth_extract/cov_files/"
     shell:
-        "Rscript methyKitIDE.R {params.inpath} {params.outdir}"
+        "Rscript scripts/methylKitIDE.R {params.inpath} {params.outdir}"
 

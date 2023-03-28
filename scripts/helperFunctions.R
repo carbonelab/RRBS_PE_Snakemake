@@ -24,6 +24,7 @@
 # Load Libraries
 
 library(ggplot2)
+library(methylKit)
 
 #------------------------------------------------------------------------------------#
 
@@ -116,6 +117,10 @@ getMethStats <- function(myObj, outputDirectory) {
       getMethylationStats(i, plot=FALSE, both.strands=FALSE)
       dev.off()
   }
+
+  print("outputDirectory:")
+  print(outputDirectory)
+  
   setwd(outputDirectory)
 }
 
@@ -140,11 +145,12 @@ getCovStats <- function(myObj, outputDirectory) {
 # FUNCTION # Returns data object #
 ############------------------------------------#
 
-getObject <- function(treatement, sampleFiles, sampleNames, minimumCoverage) {
+getObject <- function(treatment, sampleFiles, sampleNames, minimumCoverage) {
+
   myObj <- methRead(sampleFiles,
                     sample.id=sampleNames,
                     assembly="genome",
-                    treatment=treatement,
+                    treatment=treatment,
                     pipeline="bismarkCoverage",
                     context="CpG",
                     mincov=minimumCoverage)
@@ -172,26 +178,26 @@ getObject <- function(treatement, sampleFiles, sampleNames, minimumCoverage) {
 # }
 
 getTreatmentVector <- function(samples) {
-  treatment = list()
-  for (i in samples$group) {
-    append(treatement, i) 
+  treatment <- c()
+  for (i in samples) {
+    treatment <- append(treatment, i) 
   }
-  return treatement
+  return(treatment)
 }
 
 getSampleFiles <- function(samples, inputDirectory) {
   files = list()
-  for(i in samples$Sample) {
+  for(i in samples) {
     temp <- paste0(inputDirectory,i)
-    temp <- paste0(temp,"__val_1_bismark_bt2_pe.bismark.cov.gz")
+    temp <- paste0(temp,"_val_1_bismark_bt2_pe.bismark.cov.gz")
     if(!file.exists(temp)) {
         print("Sample file not found")
         quit()
     } else {
-      append(files,temp)
+      files <- append(files,temp)
     }
   }
-  return files
+  return(files)
 }
 
 ############------------------------------------#
@@ -211,7 +217,7 @@ checkInputs <- function() {
 	  dir.create(executionConfiguration$output)
   }
 
-  if(executionConfiguration$plots == FALSE AND executionConfiguration$tables == FALSE AND executionConfiguration$all == FALSE) {
+  if(executionConfiguration$plots == FALSE && executionConfiguration$tables == FALSE && executionConfiguration$all == FALSE) {
     print("No data output specified")
     quit()
   }
