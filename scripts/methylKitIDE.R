@@ -1,32 +1,17 @@
 #!/usr/bin/env Rscript
 
-#library(methylKit)
 source("scripts/helperFunctions.R")
- 
-#executionConfiguration_parser = executionConfigurationionParser(executionConfigurationion_list=getexecutionConfigurationionsList());
-#executionConfiguration = parse_args(executionConfiguration_parser);
 
 args = commandArgs(trailingOnly=TRUE)
 #checkInputs(args)
 
 #get sample information
 samples <- read.csv("data/samples.info", header=TRUE)
-
-# print(samples[,c(1)])
-
-#if all files found, return list in same order as sample.info file
-sampleFiles <- getSampleFiles(samples[,c(1)], args[1])
-
-sampleNames <- lapply(samples[,c(1)], function(x) x)
-
-
-treatment <- getTreatmentVector(samples[,c(2)])
-
-#get configuration settings
 executionConfiguration <- yaml::read_yaml("proj_config.yaml")
 
-# sampleFiles <- getSampleFiles(args[1])
-# sampleNames <- getSampleNames(args[1])
+sampleFiles <- getSampleFiles(samples[,c(1)], args[1])
+sampleNames <- lapply(samples[,c(1)], function(x) x)
+treatment <- getTreatmentVector(samples[,c(2)])
 
 myObj <- getObject(treatment, sampleFiles, sampleNames, executionConfiguration$minimum_coverage)
 
@@ -42,11 +27,8 @@ if (executionConfiguration$tables || executionConfiguration$all) {
 meth = getMergedRegions(myObj, executionConfiguration)
 
 if (executionConfiguration$tables || executionConfiguration$all) {
-    getCorrelation(meth, plot=FALSE)
-    clusterSamples(meth, dist="correlation", method="ward", plot=FALSE)
+    getMergedTables(meth, args[2])
 }
 if (executionConfiguration$plots || executionConfiguration$all) {
-    clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
-    PCASamples(meth, screeplot=TRUE)
-    PCASamples(meth)
+    getMergedPlots(meth, args[2])
 }

@@ -28,6 +28,35 @@ library(methylKit)
 
 #------------------------------------------------------------------------------------#
 
+getMergedTables <- function(meth, outputDirectory) {
+  setwd(file.path(outputDirectory))  
+
+  capture.output((getCorrelation(meth, plot=FALSE)),file="correlation.txt")
+
+  capture.output((clusterSamples(meth, dist="correlation", method="ward", plot=FALSE)),file="clustering.txt")
+
+  setwd("../../../")
+}
+
+getMergedPlots <- function(meth, outputDirectory) {
+
+  setwd(file.path(outputDirectory))
+  
+  pdf("clusteringDendro.pdf")
+  clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
+  dev.off()
+
+  pdf("pcaScree.pdf")
+  PCASamples(meth, screeplot=TRUE)
+  dev.off()
+
+  pdf("pcaScatter.pdf")
+  PCASamples(meth)
+  dev.off()
+
+  setwd("../../../")
+}
+
 ############------------------------------------#
 # FUNCTION # Returns object of merged dataset #
 ############------------------------------------#
@@ -148,26 +177,6 @@ getObject <- function(treatment, sampleFiles, sampleNames, minimumCoverage) {
                     mincov=minimumCoverage)
   return(myObj)
 }
-
-# ############------------------------------------#
-# # FUNCTION # Returns file names with full directory location #
-# ############------------------------------------#
-
-# getSampleFiles <- function(inputDirectory) {
-#   inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
-#   return(lapply(inputFiles, function(x) x))
-# }
-
-# ############------------------------------------#
-# # FUNCTION # Returns file names without file extentsions or locations #
-# ############------------------------------------#
-
-# getSampleNames <- function(inputDirectory) {
-#   inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
-#   inputNames <- gsub("_val.*", "", inputFiles)
-#   inputNames <- gsub(paste0(inputDirectory,"/"), "", inputNames)
-#   return(lapply(inputNames, function(x) x))
-# }
 
 getTreatmentVector <- function(samples) {
   treatment <- c()

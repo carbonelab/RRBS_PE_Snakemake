@@ -146,6 +146,8 @@ rule ide:
         expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
         expand("data/ide/meth_stats/{sample}__methstats.txt", sample = SAMPLES),
         expand("data/ide/cov_stats/{sample}_covstats.txt", sample = SAMPLES),
+        "data/ide/clustering.txt",
+        "data/ide/correlation.txt",
         "data/ide/clusteringDendro.pdf",
         "data/ide/pcaScree.pdf",
         "data/ide/pcaScatter.pdf"
