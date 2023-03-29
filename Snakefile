@@ -19,8 +19,10 @@ rule all:
         "data/trimming/trimgalore_stats.txt",
         "data/bismark_aln/bismark_stats.txt",
         expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
-        expand("data/ide/{sample}_percentMeth.pdf", sample = SAMPLES),
-        expand("data/ide/{sample}_percentCov.pdf", sample = SAMPLES),
+        expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
+        expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
+        expand("data/ide/meth_stats/{sample}__methstats.txt", sample = SAMPLES),
+        expand("data/ide/cov_stats/{sample}_covstats.txt", sample = SAMPLES),
         "data/ide/clusteringDendro.pdf",
         "data/ide/pcaScree.pdf",
         "data/ide/pcaScatter.pdf"
@@ -140,10 +142,10 @@ rule ide:
     # input:
     #     cov = "data/meth_extract/cov_files/{sample}__val_1_bismark_bt2_pe.bismark.cov.gz"
     output:
-        # "data/ide/{sample}_percentMeth.pdf",
-        # "data/ide/{sample}_percentCov.pdf",
-        expand("data/ide/{sample}_percentMeth.pdf", sample = SAMPLES),
-        expand("data/ide/{sample}_percentCov.pdf", sample = SAMPLES),
+        expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
+        expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
+        expand("data/ide/meth_stats/{sample}__methstats.txt", sample = SAMPLES),
+        expand("data/ide/cov_stats/{sample}_covstats.txt", sample = SAMPLES),
         "data/ide/clusteringDendro.pdf",
         "data/ide/pcaScree.pdf",
         "data/ide/pcaScatter.pdf"
