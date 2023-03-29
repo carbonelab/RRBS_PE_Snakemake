@@ -23,9 +23,11 @@ rule all:
         expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
         expand("data/ide/meth_stats/{sample}__methstats.txt", sample = SAMPLES),
         expand("data/ide/cov_stats/{sample}_covstats.txt", sample = SAMPLES),
-        "data/ide/clusteringDendro.pdf",
-        "data/ide/pcaScree.pdf",
-        "data/ide/pcaScatter.pdf"
+        "data/ide/merged_stats/clustering.txt",
+        "data/ide/merged_stats/correlation.txt",
+        "data/ide/merged_stats_plots/clusteringDendro.pdf",
+        "data/ide/merged_stats_plots/pcaScree.pdf",
+        "data/ide/merged_stats_plots/pcaScatter.pdf"
 
 rule fastqc_raw:
     input:
@@ -144,13 +146,13 @@ rule ide:
     output:
         expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
         expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
-        expand("data/ide/meth_stats/{sample}__methstats.txt", sample = SAMPLES),
+        expand("data/ide/meth_stats/{sample}_methstats.txt", sample = SAMPLES),
         expand("data/ide/cov_stats/{sample}_covstats.txt", sample = SAMPLES),
-        "data/ide/clustering.txt",
-        "data/ide/correlation.txt",
-        "data/ide/clusteringDendro.pdf",
-        "data/ide/pcaScree.pdf",
-        "data/ide/pcaScatter.pdf"
+        "data/ide/merged_stats/clustering.txt",
+        "data/ide/merged_stats/correlation.txt",
+        "data/ide/merged_stats_plots/clusteringDendro.pdf",
+        "data/ide/merged_stats_plots/pcaScree.pdf",
+        "data/ide/merged_stats_plots/pcaScatter.pdf"
     conda:
         "envs/methylKit.yaml"
     params:

@@ -29,7 +29,8 @@ library(methylKit)
 #------------------------------------------------------------------------------------#
 
 getMergedTables <- function(meth, outputDirectory) {
-  setwd(file.path(outputDirectory))  
+  dir.create(file.path(outputDirectory, "merged_stats"), showWarnings = FALSE)
+  setwd(file.path(outputDirectory, "merged_stats"))
 
   capture.output((getCorrelation(meth, plot=FALSE)),file="correlation.txt")
 
@@ -40,7 +41,8 @@ getMergedTables <- function(meth, outputDirectory) {
 
 getMergedPlots <- function(meth, outputDirectory) {
 
-  setwd(file.path(outputDirectory))
+  dir.create(file.path(outputDirectory, "merged_stats_plots"), showWarnings = FALSE)
+  setwd(file.path(outputDirectory, "merged_stats_plots"))
   
   pdf("clusteringDendro.pdf")
   clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
