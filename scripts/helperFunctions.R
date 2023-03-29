@@ -74,16 +74,16 @@ getMergedRegions <- function(myObj, executionConfiguration) {
 ############------------------------------------#
 
 getMethPlots <- function(myObj, outputDirectory) {
-
+  
   dir.create(file.path(outputDirectory, "meth_stats_plots"), showWarnings = FALSE)
   setwd(file.path(outputDirectory, "meth_stats_plots"))
-
+ 
   for (i in myObj) {
       pdf(paste0(getSampleID(i),"_methstats.pdf"))
       getMethylationStats(i, plot=TRUE, both.strands=FALSE)
       dev.off()
   }
-  setwd(outputDirectory)
+  setwd("../../../")
 }
 
 ############------------------------------------#
@@ -94,13 +94,13 @@ getCovPlots <- function(myObj, outputDirectory) {
 
   dir.create(file.path(outputDirectory, "cov_stats_plots"), showWarnings = FALSE)
   setwd(file.path(outputDirectory, "cov_stats_plots"))
-
+  
   for (i in myObj) {
       pdf(paste0(getSampleID(i),"_covstats.pdf"))
-      getMethylationStats(i, plot=TRUE, both.strands=FALSE)
+      getCoverageStats(i, plot=TRUE, both.strands=FALSE)
       dev.off()
   }
-  setwd(outputDirectory)
+  setwd("../../../")
 }
 
 ############------------------------------------#
@@ -113,15 +113,9 @@ getMethStats <- function(myObj, outputDirectory) {
   setwd(file.path(outputDirectory, "meth_stats"))
 
   for (i in myObj) {
-      pdf(paste0(getSampleID(i),"_methstats.txt"))
-      getMethylationStats(i, plot=FALSE, both.strands=FALSE)
-      dev.off()
+      capture.output((getMethylationStats(i, plot=FALSE, both.strands=FALSE)),file=paste0(getSampleID(i),"_methstats.txt"))
   }
-
-  print("outputDirectory:")
-  print(outputDirectory)
-  
-  setwd(outputDirectory)
+  setwd("../../../")
 }
 
 ############------------------------------------#
@@ -134,11 +128,9 @@ getCovStats <- function(myObj, outputDirectory) {
   setwd(file.path(outputDirectory, "cov_stats"))
 
   for (i in myObj) {
-      pdf(paste0(getSampleID(i),"_covstats.txt"))
-      getMethylationStats(i, plot=FALSE, both.strands=FALSE)
-      dev.off()
+      capture.output((getCoverageStats(i, plot=FALSE, both.strands=FALSE)),file=paste0(getSampleID(i),"_covstats.txt"))
   }
-  setwd(outputDirectory)
+  setwd("../../../")
 }
 
 ############------------------------------------#

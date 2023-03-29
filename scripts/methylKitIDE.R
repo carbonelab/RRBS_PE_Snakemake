@@ -31,7 +31,7 @@ executionConfiguration <- yaml::read_yaml("proj_config.yaml")
 myObj <- getObject(treatment, sampleFiles, sampleNames, executionConfiguration$minimum_coverage)
 
 if (executionConfiguration$plots || executionConfiguration$all) {
-    getMethPlots(myObj, args[2]) #this function must be made
+    getMethPlots(myObj, args[2]) 
     getCovPlots(myObj, args[2])
 }
 if (executionConfiguration$tables || executionConfiguration$all) {
@@ -39,14 +39,14 @@ if (executionConfiguration$tables || executionConfiguration$all) {
     getCovStats(myObj, args[2])
 }
 
-# meth = getMergedRegions(myObj, executionConfiguration)
+meth = getMergedRegions(myObj, executionConfiguration)
 
-# if (executionConfiguration$tables or executionConfiguration$all) {
-#     getCorrelation(meth, plot=FALSE)
-#     clusterSamples(meth, dist="correlation", method="ward", plot=FALSE)
-# }
-# if (executionConfiguration$plots or executionConfiguration$all) {
-#     clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
-#     PCASamples(meth, screeplot=TRUE)
-#     PCASamples(meth)
-# }
+if (executionConfiguration$tables || executionConfiguration$all) {
+    getCorrelation(meth, plot=FALSE)
+    clusterSamples(meth, dist="correlation", method="ward", plot=FALSE)
+}
+if (executionConfiguration$plots || executionConfiguration$all) {
+    clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
+    PCASamples(meth, screeplot=TRUE)
+    PCASamples(meth)
+}

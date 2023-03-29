@@ -150,7 +150,7 @@ rule ide:
     conda:
         "envs/methylKit.yaml"
     params:
-        outdir = "data/ide/",
+        outdir = "data/ide",
         inpath = "data/meth_extract/cov_files/"
     shell:
         "Rscript scripts/methylKitIDE.R {params.inpath} {params.outdir}"
