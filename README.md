@@ -2,18 +2,10 @@
 
 ## TODO:
 
-- Intial Data Exploration feature
-	1. Methylation statistics per sample\
-		a. Plots\
-		b. Tables
-	2. Coverage statistics per sample\
-		a. Plots \
-		b. Tables
-	3. Sample correlation\
-		a. Scatter plot\
-		b. Dendrogram\
-		c. PCA scree plot\
-		d. PCA scatter plot
-	4. IDE Rule in Snakemake\
+- Intial Data Exploration Feature
+	1. Advanced plot outputs\
+	2. WGBS functionality\
+
+- DMR Feature
 		 
 
