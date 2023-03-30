@@ -5,8 +5,8 @@
 
 # Functions:
 
-# getMergedStats        outputs merged data statistics
-# getMergedPlots        outputs merged data plots
+# getMergedStats        Outputs merged data statistics
+# getMergedPlots        Outputs merged data plots
 # getMergedRegions      Returns object of merged dataset
 # getMethPlots          Outputs methylation plots for all samples
 # getCovPlots           Outputs coverage plots for all samples
@@ -32,7 +32,9 @@ library(methylKit)
 ############------------------------------------#
 
 getMergedTables <- function(meth, outputDirectory) {
-  dir.create(file.path(outputDirectory, "merged_stats"), showWarnings = FALSE)
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "merged_stats"), showWarnings = FALSE)
+  }
   setwd(file.path(outputDirectory, "merged_stats"))
 
   capture.output((getCorrelation(meth, plot=FALSE)),file="correlation.txt")
@@ -48,8 +50,10 @@ getMergedTables <- function(meth, outputDirectory) {
 ############------------------------------------#
 
 getMergedPlots <- function(meth, outputDirectory) {
-
-  dir.create(file.path(outputDirectory, "merged_stats_plots"), showWarnings = FALSE)
+  
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "merged_stats_plots"), showWarnings = FALSE)
+  }
   setwd(file.path(outputDirectory, "merged_stats_plots"))
   
   pdf("clusteringDendro.pdf")
@@ -95,7 +99,10 @@ getMergedRegions <- function(myObj, executionConfiguration) {
 
 getMethPlots <- function(myObj, outputDirectory) {
   
-  dir.create(file.path(outputDirectory, "meth_stats_plots"), showWarnings = FALSE)
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "meth_stats_plots"), showWarnings = FALSE)
+  }
+
   setwd(file.path(outputDirectory, "meth_stats_plots"))
  
   for (i in myObj) {
@@ -112,7 +119,10 @@ getMethPlots <- function(myObj, outputDirectory) {
 
 getCovPlots <- function(myObj, outputDirectory) {
 
-  dir.create(file.path(outputDirectory, "cov_stats_plots"), showWarnings = FALSE)
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "cov_stats_plots"), showWarnings = FALSE)
+  }
+
   setwd(file.path(outputDirectory, "cov_stats_plots"))
   
   for (i in myObj) {
@@ -129,7 +139,10 @@ getCovPlots <- function(myObj, outputDirectory) {
 
 getMethStats <- function(myObj, outputDirectory) {
 
-  dir.create(file.path(outputDirectory, "meth_stats"), showWarnings = FALSE)
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "meth_stats"), showWarnings = FALSE)
+  }
+
   setwd(file.path(outputDirectory, "meth_stats"))
 
   for (i in myObj) {
@@ -144,7 +157,10 @@ getMethStats <- function(myObj, outputDirectory) {
 
 getCovStats <- function(myObj, outputDirectory) {
 
-  dir.create(file.path(outputDirectory, "cov_stats"), showWarnings = FALSE)
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "cov_stats"), showWarnings = FALSE)
+  }
+
   setwd(file.path(outputDirectory, "cov_stats"))
 
   for (i in myObj) {
