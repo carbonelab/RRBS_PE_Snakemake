@@ -2,33 +2,35 @@
 
 source("scripts/helperFunctions.R")
 
+#Validate script inputs
+
 args = commandArgs(trailingOnly=TRUE)
-#checkInputs(args)
+samples <- checkSamples()
+config <- checkConfiguration()
+checkInputs(args, config)
 
-#get sample information
-samples <- read.csv("data/samples.info", header=TRUE)
-executionConfiguration <- yaml::read_yaml("proj_config.yaml")
+#Extract data and store human-readable variables
 
-sampleFiles <- getSampleFiles(samples[,c(1)], args[1])
-sampleNames <- lapply(samples[,c(1)], function(x) x)
+outputDirectory <- args[2]
+inputDirectory <- args[1]
+sampleFiles <- getSampleFiles(samples[,c(1)], inputDirectory)
 treatment <- getTreatmentVector(samples[,c(2)])
+sampleNames <- getList(samples[,c(1)])
 
-myObj <- getObject(treatment, sampleFiles, sampleNames, executionConfiguration$minimum_coverage)
+#Create objects for data analysis 
 
-if (executionConfiguration$plots || executionConfiguration$all) {
-    getMethPlots(myObj, args[2]) 
-    getCovPlots(myObj, args[2])
+myObj <- getObject(treatment, sampleFiles, sampleNames, config)
+meth = getMergedRegions(myObj, config)
+
+#Output IDE files
+
+if (config$plots || config$all) {
+    getMethPlots(myObj, outputDirectory) 
+    getCovPlots(myObj, outputDirectory)
+    getMergedPlots(meth, outputDirectory)
 }
-if (executionConfiguration$tables || executionConfiguration$all) {
-    getMethStats(myObj, args[2])
-    getCovStats(myObj, args[2])
-}
-
-meth = getMergedRegions(myObj, executionConfiguration)
-
-if (executionConfiguration$tables || executionConfiguration$all) {
-    getMergedTables(meth, args[2])
-}
-if (executionConfiguration$plots || executionConfiguration$all) {
-    getMergedPlots(meth, args[2])
+if (config$tables || config$all) {
+    getMethStats(myObj, outputDirectory)
+    getCovStats(myObj, outputDirectory)
+    getMergedTables(meth, outputDirectory)
 }
