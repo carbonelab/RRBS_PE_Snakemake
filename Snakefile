@@ -1,4 +1,3 @@
-
 # Snakefile to analyze RRBS PE data
 # 
 
@@ -19,9 +18,15 @@ rule all:
         "data/fastqc/raw/fqc_stats.table.txt",
         "data/trimming/trimgalore_stats.txt",
         "data/bismark_aln/bismark_stats.txt",
-        expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES)
-        
-
+        expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
+        expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
+        expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
+        expand("data/ide/meth_stats/{sample}__methstats.txt", sample = SAMPLES),
+        expand("data/ide/cov_stats/{sample}_covstats.txt", sample = SAMPLES),
+        "data/ide/merged_stats/correlation.txt",
+        "data/ide/merged_stats_plots/clusteringDendro.pdf",
+        "data/ide/merged_stats_plots/pcaScree.pdf",
+        "data/ide/merged_stats_plots/pcaScatter.pdf"
 
 rule fastqc_raw:
     input:
@@ -134,23 +139,23 @@ rule meth_extract:
     shell:
         "bismark_methylation_extractor -p --comprehensive --merge_non_CpG --bedGraph --cytosine_report --gzip --genome_folder {params.genome_dir} -o {params.outdir} {input.bam}" 
 
-# rule ide:
-#     input:
-#         cov = "data/meth_extract/cov_files/{sample}__val_1_bismark_bt2_pe.bismark.cov.gz"
-#         #more?
-#     output:
-#         "data/meth_extract/ide/{sample}_percentMeth.pdf",
-#         "data/meth_extract/ide/{sample}_percentCov.pdf",
-#         #"data/meth_extract/ide/correlationScatter.pdf", #NEED?
-#         "data/meth_extract/ide/clusteringDendro.pdf",
-#         "data/meth_extract/ide/pcaScree.pdf",
-#         "data/meth_extract/ide/pcaScatter.pdf"
-#         #create this directory for plot outputs
-#     conda 
-#         "envs/methylKit.yaml"
-#     params:
-#         outdir = "data/meth_extract/ide",
-#         inpath = "data/meth_extract/cov_files"
-#     shell:
-#         "Rscript methyKitIDE.r"
+rule ide:
+    # input:
+    #     cov = "data/meth_extract/cov_files/{sample}__val_1_bismark_bt2_pe.bismark.cov.gz"
+    output:
+        expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
+        expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
+        expand("data/ide/meth_stats/{sample}_methstats.txt", sample = SAMPLES),
+        expand("data/ide/cov_stats/{sample}_covstats.txt", sample = SAMPLES),
+        "data/ide/merged_stats/correlation.txt",
+        "data/ide/merged_stats_plots/clusteringDendro.pdf",
+        "data/ide/merged_stats_plots/pcaScree.pdf",
+        "data/ide/merged_stats_plots/pcaScatter.pdf"
+    conda:
+        "envs/methylKit.yaml"
+    params:
+        outdir = "data/ide",
+        inpath = "data/meth_extract/cov_files/"
+    shell:
+        "Rscript scripts/methylKitIDE.R {params.inpath} {params.outdir}"
 

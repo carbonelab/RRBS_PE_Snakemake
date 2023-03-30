@@ -5,101 +5,92 @@
 
 # Functions:
 
-# getOptionsList        Returns list of command line options
+# getMergedStats        Outputs merged data statistics
+# getMergedPlots        Outputs merged data plots
 # getMergedRegions      Returns object of merged dataset
-# getCovPlots           Outputs coverage plots for all samples
 # getMethPlots          Outputs methylation plots for all samples
-# getCovStats           Outputs coverage statistics for all samples
+# getCovPlots           Outputs coverage plots for all samples
 # getMethStats          Outputs methylation stats for all samples
+# getCovStats           Outputs coverage statistics for all samples
 # getObject             Returns data object 
+# getList               Returns list object
+# getTreatmentVector    Returns treatment vector from sample info file
 # getSampleFiles        Returns file names with full directory location 
-# getSampleNames        Returns file names without file extentsions or locations
-# checkInputOptions     Validates input parameters 
-# describe_pca            
-# plot_pca
-
-
+# checkInputs           Validates input parameters
+# checkConfifuration    Verifies project configuration file exists
+# checkSamples          Verifies sample info file exists
 
 #------------------------------------------------------------------------------------#
 
 # Load Libraries
-
-library(ggplot2)
-library("optparse")
+library(methylKit)
 
 #------------------------------------------------------------------------------------#
 
 ############------------------------------------#
-# FUNCTION # Returns list of command line options #
+# FUNCTION # outputs merged data statistics #
 ############------------------------------------#
 
-#command line inputs
-#
-# -p [0,1]          : output plots ?
-# -t [0,1]          : output tables ?
-# -a [0,1]          : all plots/tables or just merged plots/tables
-# -i [directory]    : input directory
-# -o [directory]    : output directory
-# -s "c(1,1,0,0)"   : treatement??? #is this needed??
-# -c [1-100]        : minimum read coverage
-# -h [0,1]          : header line present on files?
+getMergedTables <- function(meth, outputDirectory) {
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "merged_stats"), showWarnings = FALSE)
+  }
+  setwd(file.path(outputDirectory, "merged_stats"))
 
-getOptionsList <- function() {
-  option_list = list(
-    make_option(c("-p", "--plots"), action="store_true", default="store_false", dest="plots", help="create plot output files"),
-    make_option(c("-t", "--tables"), action="store_true", default="store_false", dest="tables", help="create table output files"),
-    make_option(c("-a", "--all"), action="store_true", default="store_false", dest="all", help="create plot and table output files"),
-    make_option(c("-i", "--input"), type="character", default=NULL, help="input file directory", metavar="character"),
-    make_option(c("-o", "--output"), type="character", default=NULL, help="output file directory", metavar="character"),
-    make_option(c("-s", "--treatment"), type="character", default=NULL, help="treatement vector for input files", metavar="character"),
-    make_option(c("-c", "--coverage"), type="integer", default=NULL, help="minimum coverage amount", metavar="integer"),
-    make_option(c("-h", "--header"), action="store_true", default="store_true", dest="header", help="designate the whether the input files contain a header line"),
-    make_option(c("-r", "--regional"), action="store_true", default="store_false", dest="regional", help="specify whether or not the data should be tiled"),
-    make_option(c("-n", "--normalize"), action="store_true", default="store_false", dest="normalize", help="specify whether or not to normalize coverage after filtering"),
-    make_option(c("-m", "--processors"), action="store_true", default="store_false", dest="processors", help="specofy the number of processors to utilize in available functions")
-  ); 
-  return(option_list)
+  capture.output((getCorrelation(meth, plot=FALSE)),file="correlation.txt")
+
+  #Doesn't output anything 
+  #capture.output((clusterSamples(meth, dist="correlation", method="ward", plot=FALSE)),file="clustering.txt")
+
+  setwd("../../../")
+}
+
+############------------------------------------#
+# FUNCTION # outputs merged data plots #
+############------------------------------------#
+
+getMergedPlots <- function(meth, outputDirectory) {
+  
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "merged_stats_plots"), showWarnings = FALSE)
+  }
+  setwd(file.path(outputDirectory, "merged_stats_plots"))
+  
+  pdf("clusteringDendro.pdf")
+  clusterSamples(meth, dist="correlation", method="ward", plot=TRUE)
+  dev.off()
+
+  pdf("pcaScree.pdf")
+  PCASamples(meth, screeplot=TRUE)
+  dev.off()
+
+  pdf("pcaScatter.pdf")
+  PCASamples(meth)
+  dev.off()
+
+  setwd("../../../")
 }
 
 ############------------------------------------#
 # FUNCTION # Returns object of merged dataset #
 ############------------------------------------#
 
-getMergedRegions <- function(myObj, opt) {
+getMergedRegions <- function(myObj, executionConfiguration) {
 
   myObj.filtered <- filterByCoverage(myObj, lo.count=10, lo.perc=NULL, hi.count=NULL, hi.perc=99.9)
 
-  if (opt$normalize) {
-    myObj.filtered <- normalizeCoverage(myObj.filtered, method="median")
-  }
+  myObj.filtered <- normalizeCoverage(myObj.filtered, method="median")
+  
+  my.tiles <- tileMethylCounts(myObj.filtered,
+                                win.size=1000,
+                                step.size=1000,
+                                cov.bases=10,
+                                mc.cores=executionConfiguration$processors
+  )
 
-  if (opt$regional) {
-    my.tiles <- tileMethylCounts(myObj.filtered,
-                                 win.size=1000,
-                                 step.size=1000,
-                                 cov.bases=10,
-                                 mc.cores=opt$processors
-    )
-    for (i in 1:length(my.tiles)) {
-      print(nrow(my.tiles[[i]]))
-    }
-    # merge the tiles
-    print("Merging tiled regions across samples.")
-    meth <- methylKit::unite(my.tiles, min.per.group=NULL, mc.cores=opt$processors)
-    print(paste0("Returning ", nrow(meth), " regions."))
+  meth <- methylKit::unite(my.tiles, min.per.group=NULL, mc.cores=executionConfiguration$processors)
 
-    return(meth)
-  }
-
-  # if not regional, just merge cpgs with no tiling
-  else {
-    print("merging CpGs")
-    meth <- methylKit::unite(myObj.filtered,
-                  min.per.group=NULL,
-                  destrand=FALSE)
-    print(paste0("Returning ", nrow(meth), " CpGs."))
-    return(meth)
-  }
+  return(meth)
 }
 
 ############------------------------------------#
@@ -107,16 +98,19 @@ getMergedRegions <- function(myObj, opt) {
 ############------------------------------------#
 
 getMethPlots <- function(myObj, outputDirectory) {
+  
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "meth_stats_plots"), showWarnings = FALSE)
+  }
 
-  dir.create(file.path(outputDirectory, "meth_stats_plots"), showWarnings = FALSE)
   setwd(file.path(outputDirectory, "meth_stats_plots"))
-
+ 
   for (i in myObj) {
       pdf(paste0(getSampleID(i),"_methstats.pdf"))
       getMethylationStats(i, plot=TRUE, both.strands=FALSE)
       dev.off()
   }
-  setwd(outputDirectory)
+  setwd("../../../")
 }
 
 ############------------------------------------#
@@ -125,111 +119,129 @@ getMethPlots <- function(myObj, outputDirectory) {
 
 getCovPlots <- function(myObj, outputDirectory) {
 
-  dir.create(file.path(outputDirectory, "cov_stats_plots"), showWarnings = FALSE)
-  setwd(file.path(outputDirectory, "cov_stats_plots"))
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "cov_stats_plots"), showWarnings = FALSE)
+  }
 
+  setwd(file.path(outputDirectory, "cov_stats_plots"))
+  
   for (i in myObj) {
       pdf(paste0(getSampleID(i),"_covstats.pdf"))
-      getMethylationStats(i, plot=TRUE, both.strands=FALSE)
+      getCoverageStats(i, plot=TRUE, both.strands=FALSE)
       dev.off()
   }
-  setwd(outputDirectory)
+  setwd("../../../")
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # Outputs methylation stats for all samples #
 ############------------------------------------#
 
 getMethStats <- function(myObj, outputDirectory) {
 
-  dir.create(file.path(outputDirectory, "meth_stats"), showWarnings = FALSE)
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "meth_stats"), showWarnings = FALSE)
+  }
+
   setwd(file.path(outputDirectory, "meth_stats"))
 
   for (i in myObj) {
-      pdf(paste0(getSampleID(i),"_methstats.txt"))
-      getMethylationStats(i, plot=FALSE, both.strands=FALSE)
-      dev.off()
+      capture.output((getMethylationStats(i, plot=FALSE, both.strands=FALSE)),file=paste0(getSampleID(i),"_methstats.txt"))
   }
-  setwd(outputDirectory)
+  setwd("../../../")
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # Outputs coverage statistics for all samples #
 ############------------------------------------#
 
 getCovStats <- function(myObj, outputDirectory) {
 
-  dir.create(file.path(outputDirectory, "cov_stats"), showWarnings = FALSE)
+  if(!file.exists(outputDirectory)) {
+    dir.create(file.path(outputDirectory, "cov_stats"), showWarnings = FALSE)
+  }
+
   setwd(file.path(outputDirectory, "cov_stats"))
 
   for (i in myObj) {
-      pdf(paste0(getSampleID(i),"_covstats.txt"))
-      getMethylationStats(i, plot=FALSE, both.strands=FALSE)
-      dev.off()
+      capture.output((getCoverageStats(i, plot=FALSE, both.strands=FALSE)),file=paste0(getSampleID(i),"_covstats.txt"))
   }
-  setwd(outputDirectory)
+  setwd("../../../")
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # Returns data object #
 ############------------------------------------#
 
-getObject <- function(opt, sampleFiles, sampleNames) {
+getObject <- function(treatment, sampleFiles, sampleNames, configuration) {
+
   myObj <- methRead(sampleFiles,
                     sample.id=sampleNames,
+                    header=configuration$header_present,
                     assembly="genome",
-                    treatment=opt$treatement,
+                    treatment=treatment,
                     pipeline="bismarkCoverage",
                     context="CpG",
-                    mincov=opt$coverage)
+                    mincov=configuration$minimum_coverage)
   return(myObj)
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # returns list object #
 ############------------------------------------#
 
-getSampleFiles <- function(inputDirectory) {
-  inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
-  inputNames <- gsub("_val.*", "", inputFiles)
-  inputNames <- gsub(paste0(inputDirectory,"/"), "", inputNames)
-  return(lapply(inputFiles, function(x) x))
+getList <- function(temp) {
+  return(lapply(temp, function(x) x))
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # returns treatment vector from sample.info file #
 ############------------------------------------#
 
-getSampleNames <- function(inputDirectory) {
-  inputFiles <- list.files(inputDirectory, "*.cov.gz", full=T)
-  inputNames <- gsub("_val.*", "", inputFiles)
-  inputNames <- gsub(paste0(inputDirectory,"/"), "", inputNames)
-  return(lapply(inputNames, function(x) x))
-}
-
-############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
-############------------------------------------#
-
-checkInputOptions <- function(opt) {
-  if(!file.exists(opt$input)) {
-	  print("input directory not found")
-	  quit()
+getTreatmentVector <- function(samples) {
+  treatment <- c()
+  for (i in samples) {
+    treatment <- append(treatment, i) 
   }
+  return(treatment)
+}
 
-  #if(opt$treatment)
+############------------------------------------#
+# FUNCTION # verifies sample files exist and returns list of files #
+############------------------------------------#
 
-  if(!file.exists(opt$output)) {
+getSampleFiles <- function(samples, inputDirectory) {
+  files = list()
+  for(i in samples) {
+    temp <- paste0(inputDirectory,i)
+    temp <- paste0(temp,"_val_1_bismark_bt2_pe.bismark.cov.gz")
+    if(!file.exists(temp)) {
+        print("Sample file not found")
+        quit()
+    } else {
+      files <- append(files,temp)
+    }
+  }
+  return(files)
+}
+
+############------------------------------------#
+# FUNCTION # validates input parameters #
+############------------------------------------#
+
+checkInputs <- function(args, executionConfiguration) {
+
+  if(!file.exists(args[2])) {
 	  print("output directory not found, creating one now")
-	  dir.create(opt$output)
+	  dir.create(executionConfiguration$output)
   }
 
-  if(opt$plots == FALSE AND opt$tables == FALSE AND opt$all == FALSE) {
+  if(executionConfiguration$plots == FALSE && executionConfiguration$tables == FALSE && executionConfiguration$all == FALSE) {
     print("No data output specified")
     quit()
   }
 
-  temp <- list.files(opt$input, "*.cov.gz", full=T)
+  temp <- list.files(args[1], "*.cov.gz", full=T)
   if(!length(temp) > 1) {
     print("No input files found")
     quit()
@@ -237,102 +249,27 @@ checkInputOptions <- function(opt) {
 }
 
 ############------------------------------------#
-# FUNCTION # to describe a prcomp result object #
+# FUNCTION # Verifies project configuration file exists #
 ############------------------------------------#
 
-describe_pca <- function(mypca) {
-  # Determine how many PC's were returned
-  print(paste0("Number of PC's returned: ", ncol(mypca$x)))
-
-  # Obtain the eigenvalues (can get values proportional to eigenvalues by taking sd^2)
-  eigs <- mypca$sdev^2
-
-  # Determine number of PC's with eigenvalue > 1 (considered important)
-  print(paste0("Number of PC's with eigenvalue > 1: ", sum(eigs > 1)))
-
-  # Determine how much of total variance is explained by first PC
-  print(paste0("Percent of total variance explained by first PC: ", round((eigs[1]/sum(eigs))*100, digits=2), "%"))
-
-  # How many PC's are needed to explain at least 80% of total variance
-  my_sum = 0
-  num_pc = 0
-  for (i in 1:ncol(mypca$x)) {
-    my_sum = my_sum + (eigs[i] / sum(eigs))
-    num_pc = num_pc + 1
-    if (my_sum >= 0.8) {
-      break
-    }
-  }
-  print(paste0("Number of PC's required to explain at least 80% of the variance: ", num_pc))
-
-  return(num_pc)
-}
-
-#----------------------------------------------------------------------------------------------------------#
-
-############-------------------------------#
-# FUNCTION # to create a biplot from a PCA #
-############-------------------------------#
-plot_pca <- function(df, pc_a="PC1", pc_b="PC2", color_var, shape_var, label_var, eigs=eigs, num_cpg, tiles=FALSE) {
-
-  # get the percent variance explained by the two PC's
-  pc_a_var <- round(((eigs[as.numeric(gsub("PC", "", pc_a))] / sum(eigs)) * 100), 1)
-  pc_b_var <- round(((eigs[as.numeric(gsub("PC", "", pc_b))] / sum(eigs)) * 100), 1)
-
-  # subtitle
-  #subtitle <- paste0(pc_a, " by ", pc_b)
-
-  # check to see if any variables are "NULL" and change them to NULL
-  if (color_var == "NULL") {
-    color_var <- NULL
-  }
-  if (shape_var == "NULL") {
-    shape_var <- NULL
-  }
-  if (label_var == "NULL") {
-    label_var <- NULL
-  }
-
-  # filename
-  if (is.null(shape_var)) {
-    filename <- paste0(pc_a, "_", pc_b, "_", "color_by_", color_var, ".pdf")
+checkConfiguration <- function() {
+  if(!file.exists("proj_config.yaml")) {
+    print("Project configuration file not found")
+    quit()
   } else {
-    filename <- paste0(pc_a, "_", pc_b, "_", "color_", color_var, "_shape_", shape_var, ".pdf")
+      return(yaml::read_yaml("proj_config.yaml"))
   }
-
-  # General Format of plotting PCA (with snakemake and string variables)
-  myplot <- ggplot(df, aes_string(pc_a, pc_b, color=color_var, shape=shape_var)) +
-    geom_point(size=5) +
-    xlab(paste0(pc_a, ": ", pc_a_var, "% variance")) +
-    ylab(paste0(pc_b, ": ", pc_b_var, "% variance")) +
-    #if (tiles==TRUE) {
-    #  ggtitle(paste0("PCA: CpG Methylation: ", num_cpg, " tiles")) +
-    #}
-    #if (tiles==FALSE) {
-    #  ggtitle(paste0("PCA: CpG Methylation: ", num_cpg, " CpGs")) +
-    #}
-    geom_text(aes_string(label=label_var),hjust=0.7, vjust=-1.1, show.legend = FALSE) +
-    theme_classic() +
-    theme(legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid')) +
-    if (tiles==TRUE) {
-      ggtitle(paste0("PCA: CpG Methylation: ", num_cpg, " tiles"))
-    }
-    if (tiles==FALSE) {
-      ggtitle(paste0("PCA: CpG Methylation: ", num_cpg, " CpGs"))
-    }
-  ggsave(filename=filename)
-
-  # General Format of plotting PCA (with manual variables)
-  #myplot <- ggplot(df, aes_string(pc_a, pc_b, color=color_var, shape=shape_var)) +
-  #  geom_point(size=5) +
-  #  xlab(paste0(pc_a, ": ", pc_a_var, "% variance")) +
-  #  ylab(paste0(pc_b, ": ", pc_b_var, "% variance")) +
-  #  ggtitle("PCA: CpG Methylation") +
-  #  geom_text(aes_string(label=label_var),hjust=0.7, vjust=-1.1, show.legend = FALSE) +
-  #  theme_classic() +
-  #  theme(legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'))
-  #ggsave(filename=filename)
 }
 
-#------------------------------------------------------------------------------------------------------------#
+############------------------------------------#
+# FUNCTION # Verifies sample info file exists #
+############------------------------------------#
 
+checkSamples <- function() {
+  if(!file.exists("data/samples.info")) {
+    print("Sample information file not found")
+    quit()
+  } else {
+      return(suppressWarnings(read.csv("data/samples.info", header=TRUE)))
+  }
+}
