@@ -17,8 +17,18 @@ sampleNames <- getList(samples[,c(1)])
 myObj <- getObject(treatment, sampleFiles, sampleNames, config)
 meth = getMergedRegions(myObj, config)
 
-#Merge/Filter
-
 #DMR 
+res <- calc.DMRs(meth,
+                 covariate=NULL,
+                 overdispersion="MN",
+                 test="Chisq",
+                 comparison="TS_BAV_v_TS",
+                 meth.diff=10,
+                 qval=0.1,
+                 type="DMR",
+		 mc=1
+)
+
 
 #Bed files
+makeBED(res, "TS_BAV_v_TS", "DMR")
