@@ -159,3 +159,18 @@ rule ide:
     shell:
         "Rscript scripts/methylKitIDE.R {params.inpath} {params.outdir}"
 
+#creates DRMs
+rule dmr:
+    output:
+        expand("data/dmr/{sample}.bed")
+    conda:
+        "envs/methylKit.yaml"
+    params:
+        outdir = "data/dmr",
+        inpath = "data/meth_extract/cov_files/"
+    shell:
+        "Rscript scripts/methylKitDMR.R {params.inpath} {params.outdir}"
+
+
+#checks if the DMRs are signifigant 
+rule beds:
