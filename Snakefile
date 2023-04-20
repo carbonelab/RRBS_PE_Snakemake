@@ -21,7 +21,7 @@ rule all:
         expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
         expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
         expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
-        expand("data/ide/meth_stats/{sample}__methstats.txt", sample = SAMPLES),
+        expand("data/ide/meth_stats/{sample}_methstats.txt", sample = SAMPLES),
         expand("data/ide/cov_stats/{sample}_covstats.txt", sample = SAMPLES),
         "data/ide/merged_stats/correlation.txt",
         "data/ide/merged_stats_plots/clusteringDendro.pdf",
@@ -140,8 +140,8 @@ rule meth_extract:
         "bismark_methylation_extractor -p --comprehensive --merge_non_CpG --bedGraph --cytosine_report --gzip --genome_folder {params.genome_dir} -o {params.outdir} {input.bam}" 
 
 rule ide:
-    # input:
-    #     cov = "data/meth_extract/cov_files/{sample}__val_1_bismark_bt2_pe.bismark.cov.gz"
+#    input:
+#         cov = expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
     output:
         expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
         expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
@@ -155,7 +155,7 @@ rule ide:
         "envs/methylKit.yaml"
     params:
         outdir = "data/ide",
-        inpath = "data/meth_extract/cov_files/"
+        inpath = "data/meth_extract/"
     shell:
         "Rscript scripts/methylKitIDE.R {params.inpath} {params.outdir}"
 
