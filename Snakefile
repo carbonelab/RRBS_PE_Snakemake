@@ -18,6 +18,7 @@ rule all:
         "data/fastqc/raw/fqc_stats.table.txt",
         "data/trimming/trimgalore_stats.txt",
         "data/bismark_aln/bismark_stats.txt",
+#	"data/metrics_summary.xlsx",
         expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
         expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
         expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
@@ -27,6 +28,7 @@ rule all:
         "data/ide/merged_stats_plots/clusteringDendro.pdf",
         "data/ide/merged_stats_plots/pcaScree.pdf",
         "data/ide/merged_stats_plots/pcaScatter.pdf"
+#	"data/dmr/VF_v_VP.sigDMRs.txt"
 
 rule fastqc_raw:
     input:
@@ -123,6 +125,16 @@ rule collect_bismark_metrics:
     shell:
         "python scripts/parse.bismark.pe.logs.py -d {params.inpath} -o {params.outfile}"
 
+#rule summarize_metrics:
+#    input:
+#        "data/bismark_aln/bismark_stats.txt",
+#        "data/trimming/trimgalore_stats.txt",
+#        "data/fastqc/raw/fqc_stats.table.txt"
+#    output:
+#        "data/metrics_summary.xlsx"
+#    shell:
+#        "scripts/combine_metrics.sh"
+
 rule meth_extract:
     input:
         bam = "data/bismark_aln/{sample}_val_1_bismark_bt2_pe.bam"
@@ -140,8 +152,8 @@ rule meth_extract:
         "bismark_methylation_extractor -p --comprehensive --merge_non_CpG --bedGraph --cytosine_report --gzip --genome_folder {params.genome_dir} -o {params.outdir} {input.bam}" 
 
 rule ide:
-#    input:
-#         cov = expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
+    input:
+         cov = expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
     output:
         expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
         expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
@@ -159,18 +171,15 @@ rule ide:
     shell:
         "Rscript scripts/methylKitIDE.R {params.inpath} {params.outdir}"
 
-#creates DRMs
-rule dmr:
-    output:
-        expand("data/dmr/{sample}.bed")
-    conda:
-        "envs/methylKit.yaml"
-    params:
-        outdir = "data/dmr",
-        inpath = "data/meth_extract/cov_files/"
-    shell:
-        "Rscript scripts/methylKitDMR.R {params.inpath} {params.outdir}"
-
-
-#checks if the DMRs are signifigant 
-rule beds:
+#rule dmr:
+##    input:
+##         cov = expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
+#    output:
+#        "data/dmr/VF_v_VP.sigDMRs.txt"
+#    conda:
+#        "envs/methylKit.yaml"
+#    params:
+#        outdir = "data/dmr",
+#        inpath = "data/meth_extract/"
+#    shell:
+#        "Rscript scripts/methylKitDMR.R {params.inpath} {params.outdir}"
