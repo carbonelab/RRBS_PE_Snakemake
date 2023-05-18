@@ -1,4 +1,4 @@
-# RRBS_PE_Snakemake
+# RRBS PE Snakemake
 
 Bisulfite sequence analysis pipeline
 
