@@ -20,7 +20,7 @@ Bisulfite sequence analysis pipeline
 - HOMER feature
 	1. Testing
 
-## Tools Utilized
+## Tools/Dependencies 
 - [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 - [MultiQC](https://multiqc.info/)
 - [TrimGalore](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)
