@@ -180,7 +180,7 @@ rule dmr:
     output:
         expand("data/dmr/{comparison}/{comparison}.sigDMRs.bed", comparison = config["comparisons"])
     conda:
-        "envs/methylKit.yaml"
+        "envs/methylKit.yaml" #create this yaml
     params:
         outdir = "data/dmr", 
         inpath = "data/meth_extract/", 
@@ -194,9 +194,9 @@ rule chipseeker:
     output:
         expand("data/dmr/{comparison}/{comparison}.sigDMRs.annot.xlsx", comparison = config["comparisons"])
     conda:
-        "envs/chipseeker.yaml"
+        "envs/chipseeker.yaml" #create this yaml
     params:
-        comparisons = config["comparisons"] #confirm this works
+        comparisons = expand("{comparison}", comparison = config["comparisons"])
     shell:
         "Rscript run_chipseeker.R {params.comparisons} {input.dmrs}"
 
