@@ -176,20 +176,21 @@ rule ide:
 
 rule dmr:
     input:
-        expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
+        cov = expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
     output:
         expand("data/dmr/{comparison}/{comparison}.sigDMRs.bed", comparison = config["comparisons"])
     conda:
         "envs/methylKit.yaml"
     params:
-        outdir = "data/dmr", #Update script to create output directories 
-        inpath = "data/meth_extract/" 
+        outdir = "data/dmr", 
+        inpath = "data/meth_extract/", 
+        comparison = expand("data/dmr/{comparison}", comparison = config["comparisons"])
     shell:
-        "Rscript scripts/methylKitDMR.R {params.inpath} {params.outdir}" #needs to autogenerate comparison reorganization
+        "Rscript scripts/methylKitDMR.R {params.inpath} {params.outdir} {params.comparison}" #needs to autogenerate comparison reorganization
 
 rule chipseeker:
     input:
-        expand("data/dmr/{comparison}/{comparison}.sigDMRs.txt", comparison = config["comparisons"])
+        dmrs = expand("data/dmr/{comparison}/{comparison}.sigDMRs.txt", comparison = config["comparisons"])
     output:
         expand("data/dmr/{comparison}/{comparison}.sigDMRs.annot.xlsx", comparison = config["comparisons"])
     conda:
@@ -197,11 +198,11 @@ rule chipseeker:
     params:
         comparisons = config["comparisons"] #confirm this works
     shell:
-        "Rscript run_chipseeker.R {params.comparisons}" #add functionality 
+        "Rscript run_chipseeker.R {params.comparisons} {input.dmrs}"
 
 rule homer:
     input:
-        expand("data/dmr/{comparison}/{comparison}.sigDMRs.bed", comparison = config["comparisons"])
+        bed = expand("data/dmr/{comparison}/{comparison}.sigDMRs.bed", comparison = config["comparisons"])
     output:
         expand("data/homer/{comparison}.sigDMRs/knownResults.html", comparison = config["comparisons"])
     conda:

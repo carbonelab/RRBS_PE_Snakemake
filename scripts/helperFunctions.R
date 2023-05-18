@@ -27,6 +27,18 @@ library(methylKit)
 
 #------------------------------------------------------------------------------------#
 
+getPlots <- function(myObj, outputDirectory, meth) {
+    getMethPlots(myObj, outputDirectory) 
+    getCovPlots(myObj, outputDirectory)
+    getMergedPlots(meth, outputDirectory)
+}
+
+getStats <- function(myObj, outputDirectory, meth) {
+    getMethStats(myObj, outputDirectory)
+    getCovStats(myObj, outputDirectory)
+    getMergedTables(meth, outputDirectory)
+}
+
 ############------------------------------------#
 # FUNCTION # outputs merged data statistics #
 ############------------------------------------#
@@ -234,11 +246,6 @@ checkInputs <- function(args, executionConfiguration) {
   if(!file.exists(args[2])) {
 	  print("output directory not found, creating one now")
 	  dir.create(executionConfiguration$output)
-  }
-
-  if(executionConfiguration$plots == FALSE && executionConfiguration$tables == FALSE && executionConfiguration$all == FALSE) {
-    print("No data output specified")
-    quit()
   }
 
   temp <- list.files(args[1], "*.cov.gz", full=T)

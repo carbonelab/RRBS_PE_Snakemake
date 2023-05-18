@@ -24,13 +24,6 @@ meth = getMergedRegions(myObj, config)
 
 #Output IDE files
 
-if (config$plots || config$all) {
-    getMethPlots(myObj, outputDirectory) 
-    getCovPlots(myObj, outputDirectory)
-    getMergedPlots(meth, outputDirectory)
-}
-if (config$tables || config$all) {
-    getMethStats(myObj, outputDirectory)
-    getCovStats(myObj, outputDirectory)
-    getMergedTables(meth, outputDirectory)
-}
+getPlots(myObj, outputDirectory, meth)
+
+getStats(myObj, outputDirectory, meth)

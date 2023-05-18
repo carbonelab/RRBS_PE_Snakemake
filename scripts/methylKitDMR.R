@@ -32,6 +32,12 @@ myObj <- getObject(treatment, sampleFiles, sampleNames, config)
 meth = getMergedRegions(myObj, config)
 
 #group 1 vs group 2
+dir.create(args[3])
+setwd(args[3])
+
+
+#Wrapper script generates the information below:
+
 c1 <- reorganize(meth,
 		sample.ids=c("UMN_1_1","UMN_3_1","UMN_5_1","UMN_7_1","UMN_11_1","UMN_1_10","UMN_5_10","UMN_3_10","UMN_7_10","UMN_11_12"),
 		treatment=c(0,0,0,0,0,1,1,1,1,1)
@@ -51,67 +57,3 @@ res1 <- calc.DMRs(c1,
 )
 
 makeBED(res1,"PatientPre_v_PatientPost","DMR")
-
-#group 1 vs group 3
-c2 <- reorganize(meth,
-		sample.ids=c("UMN_1_1","UMN_3_1","UMN_5_1","UMN_7_1","UMN_11_1","UMN_2_1","UMN_6_1","UMN_4_1","UMN_8_1","UMN_12_1"),
-		treatment=c(0,0,0,0,0,1,1,1,1,1)
-)
-
-covariates2 <- data.frame(individual = c("1","3","5","7","11","2","6","4","8","12"))
-
-res2 <- calc.DMRs(c2,
-                covariate=covariates2,
-                overdispersion="MN",
-                test="Chisq",
-                comparison="PatientPre_v_ControlPre",
-                meth.diff=10,
-                qval=0.1,
-                type="DMR",
-                mc=8
-)
-
-makeBED(res2,"PatientPre_v_ControlPre","DMR")
-
-#group 3 vs group 4
-c3 <- reorganize(meth,
-		sample.ids=c("UMN_2_1","UMN_6_1","UMN_4_1","UMN_8_1","UMN_12_1","UMN_2_10","UMN_6_10","UMN_4_10","UMN_8_10","UMN_12_12"),
-		treatment=c(0,0,0,0,0,1,1,1,1,1)
-)
-
-covariates3 <- data.frame(individual = c("2","6","4","8","12","2","6","4","8","12"))
-
-res3 <- calc.DMRs(c3,
-                covariate=covariates3,
-                overdispersion="MN",
-                test="Chisq",
-                comparison="ControlPre_v_ControlPost",
-                meth.diff=10,
-                qval=0.1,
-                type="DMR",
-                mc=8
-)
-
-makeBED(res3,"ControlPre_v_ControlPost","DMR")
-
-#group 2 vs group 4F
-c4 <- reorganize(meth,
-		sample.ids=c("UMN_1_10","UMN_5_10","UMN_3_10","UMN_7_10","UMN_11_12","UMN_2_10","UMN_6_10","UMN_4_10","UMN_8_10","UMN_12_12"),
-		treatment=c(0,0,0,0,0,1,1,1,1,1)
-)
-
-covariates4 <- data.frame(individual = c("1","5","3","7","11","2","6","4","8","12"))
-
-res4 <- calc.DMRs(c4,
-                covariate=covariates4,
-                overdispersion="MN",
-                test="Chisq",
-                comparison="PatientPost_v_ControlPost",
-                meth.diff=10,
-                qval=0.1,
-                type="DMR",
-                mc=8
-)
-
-makeBED(res4,"PatientPost_v_ControlPost","DMR")
-
