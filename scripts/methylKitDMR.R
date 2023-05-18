@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
-source("/home/groups/hoolock2/u0/jtw/roselli/scripts/helperFunctions.R")
-source("/home/groups/hoolock2/u0/jtw/roselli/scripts/methylkit_diff_functions.R")
+source("scripts/helperFunctions.R")
+source("scripts/methylkit_diff_functions.R")
 
 library(methylKit)
 library(ggplot2)

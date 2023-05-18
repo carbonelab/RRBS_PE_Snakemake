@@ -1,15 +1,17 @@
 #!/bin/bash
 
-join data/fastqc/raw/fqc_stats.table.txt data/trimming/trimgalore_stats.txt > data/tempMetrics.txt
+cd $1
 
-join data/tempMetrics.txt data/bismark_aln/bismark_stats.txt > data/metrics_summary.txt
+join fastqc/raw/fqc_stats.table.txt trimming/trimgalore_stats.txt > tempMetrics.txt
 
-sed -e 's/\s/,/g' data/metrics_summary.txt > data/metrics_summary.csv
+join tempMetrics.txt bismark_aln/bismark_stats.txt > metrics_summary.txt
 
-unix2dos data/metrics_summary.csv
+sed -e 's/\s/,/g' metrics_summary.txt > metrics_summary.csv
 
-ssconvert data/metrics_summary.csv data/metrics_summary.xlsx
+unix2dos metrics_summary.csv
 
-rm -rf data/tempMetrics.txt
-rm -rf data/metrics_summary.txt
-rm -rf data/metrics_summary.csv
+ssconvert metrics_summary.csv metrics_summary.xlsx
+
+rm -rf tempMetrics.txt
+rm -rf metrics_summary.txt
+rm -rf metrics_summary.csv

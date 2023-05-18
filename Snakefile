@@ -18,7 +18,7 @@ rule all:
         "data/fastqc/raw/fqc_stats.table.txt",
         "data/trimming/trimgalore_stats.txt",
         "data/bismark_aln/bismark_stats.txt",
-#	"data/metrics_summary.xlsx",
+        "data/metrics_summary.xlsx",
         expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.CpG_report.txt.gz", sample = SAMPLES),
         expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
         expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
@@ -27,8 +27,9 @@ rule all:
         "data/ide/merged_stats/correlation.txt",
         "data/ide/merged_stats_plots/clusteringDendro.pdf",
         "data/ide/merged_stats_plots/pcaScree.pdf",
-        "data/ide/merged_stats_plots/pcaScatter.pdf"
-#	"data/dmr/VF_v_VP.sigDMRs.txt"
+        "data/ide/merged_stats_plots/pcaScatter.pdf",
+        expand("data/dmr/{comparison}/{comparison}.sigDMRs.bed", comparison = config["comparisons"]),
+        expand("data/homer/{comparison}.sigDMRs/knownResults.html", comparison = config["comparisons"])
 
 rule fastqc_raw:
     input:
@@ -125,15 +126,17 @@ rule collect_bismark_metrics:
     shell:
         "python scripts/parse.bismark.pe.logs.py -d {params.inpath} -o {params.outfile}"
 
-#rule summarize_metrics:
-#    input:
-#        "data/bismark_aln/bismark_stats.txt",
-#        "data/trimming/trimgalore_stats.txt",
-#        "data/fastqc/raw/fqc_stats.table.txt"
-#    output:
-#        "data/metrics_summary.xlsx"
-#    shell:
-#        "scripts/combine_metrics.sh"
+rule summarize_metrics:
+    input:
+        "data/bismark_aln/bismark_stats.txt",
+        "data/trimming/trimgalore_stats.txt",
+        "data/fastqc/raw/fqc_stats.table.txt"
+    output:
+        "data/metrics_summary.xlsx"
+    params:
+        inpath = "data"
+    shell:
+        "scripts/combine_metrics.sh {params.inpath}"
 
 rule meth_extract:
     input:
@@ -153,7 +156,7 @@ rule meth_extract:
 
 rule ide:
     input:
-         cov = expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
+        cov = expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
     output:
         expand("data/ide/meth_stats_plots/{sample}_methstats.pdf", sample = SAMPLES),
         expand("data/ide/cov_stats_plots/{sample}_covstats.pdf", sample = SAMPLES),
@@ -171,15 +174,29 @@ rule ide:
     shell:
         "Rscript scripts/methylKitIDE.R {params.inpath} {params.outdir}"
 
-#rule dmr:
-##    input:
-##         cov = expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
-#    output:
-#        "data/dmr/VF_v_VP.sigDMRs.txt"
-#    conda:
-#        "envs/methylKit.yaml"
-#    params:
-#        outdir = "data/dmr",
-#        inpath = "data/meth_extract/"
-#    shell:
-#        "Rscript scripts/methylKitDMR.R {params.inpath} {params.outdir}"
+rule dmr:
+    input:
+        expand("data/meth_extract/{sample}_val_1_bismark_bt2_pe.bismark.cov.gz", sample = SAMPLES)
+    output:
+        expand("data/dmr/{comparison}/{comparison}.sigDMRs.bed", comparison = config["comparisons"])
+    conda:
+        "envs/methylKit.yaml"
+    params:
+        outdir = "data/dmr", #Update script to create output directories 
+        inpath = "data/meth_extract/" 
+    shell:
+        "Rscript scripts/methylKitDMR.R {params.inpath} {params.outdir}" #needs to autogenerate comparison reorganization
+
+rule homer:
+    input:
+        expand("data/dmr/{comparison}/{comparison}.sigDMRs.bed", comparison = config["comparisons"])
+    output:
+        expand("data/homer/{comparison}.sigDMRs/knownResults.html", comparison = config["comparisons"])
+    conda:
+        "envs/homer.yaml" #create this yaml
+    params:
+        inpath = "data"
+    shell:
+        "scrips/run_homer_findMotifsGenome.sh {params.inpath}"
+
+
