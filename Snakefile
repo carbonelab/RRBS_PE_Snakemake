@@ -187,6 +187,18 @@ rule dmr:
     shell:
         "Rscript scripts/methylKitDMR.R {params.inpath} {params.outdir}" #needs to autogenerate comparison reorganization
 
+rule chipseeker:
+    input:
+        expand("data/dmr/{comparison}/{comparison}.sigDMRs.txt", comparison = config["comparisons"])
+    output:
+        expand("data/dmr/{comparison}/{comparison}.sigDMRs.annot.xlsx", comparison = config["comparisons"])
+    conda:
+        "envs/chipseeker.yaml"
+    params:
+        comparisons = config["comparisons"] #confirm this works
+    shell:
+        "Rscript run_chipseeker.R {params.comparisons}" #add functionality 
+
 rule homer:
     input:
         expand("data/dmr/{comparison}/{comparison}.sigDMRs.bed", comparison = config["comparisons"])
