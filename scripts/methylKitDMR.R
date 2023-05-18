@@ -31,7 +31,7 @@ sampleNames <- getList(samples[,c(1)])
 myObj <- getObject(treatment, sampleFiles, sampleNames, config)
 meth = getMergedRegions(myObj, config)
 
-#group 1 vs group 2
+#move to comparison directory
 dir.create(args[3])
 setwd(args[3])
 
@@ -55,5 +55,7 @@ res1 <- calc.DMRs(c1,
 		type="DMR",
 		mc=8
 )
+
+#error handling here to prevent job failure
 
 makeBED(res1,"PatientPre_v_PatientPost","DMR")
