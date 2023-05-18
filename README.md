@@ -21,10 +21,10 @@ Bisulfite sequence analysis pipeline
 	1. Testing
 
 ## Tools Utilized
-- FastQC
-- MultiQC
-- TrimGalore
-- Bismark
-- MethylKit
-- ChipSeeker
-- HOMER
+- [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+- [MultiQC](https://multiqc.info/)
+- [TrimGalore](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/)
+- [Bismark](https://www.bioinformatics.babraham.ac.uk/projects/bismark/)
+- [MethylKit](https://bioconductor.org/packages/release/bioc/html/methylKit.html)
+- [ChIpSeeker](https://bioconductor.org/packages/release/bioc/vignettes/ChIPseeker/inst/doc/ChIPseeker.html)
+- [HOMER](http://homer.ucsd.edu/homer/)
