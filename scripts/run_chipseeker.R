@@ -11,23 +11,17 @@ library(writexl)
 # INPUT VARIABLES
 
 # input a gtf file
-gtf_file <- paste0("/home/groups/hoolock2/u0/genomes/ensembl/",
-  "homo_sapiens/primary_assembly/annotation/Homo_sapiens.GRCh38.103.gtf")
+gtf_file <- args[3]
 
 # gene info file
-gene_info_file <- paste0("/home/groups/hoolock2/u0/genomes/ensembl/",
-  "homo_sapiens/primary_assembly/annotation/GRCh38.103.gene_info.txt")
+gene_info_file <- args[4]
 
 # sig dmr results txt file
 sig_dmrs_txt <- args[2]
 
-#paste0("/home/groups/hoolock2/u0/jtw/newell/data/",
- # "dmr/comparison4/PatientPost_v_ControlPost.sigDMRs.txt")
-
 # comparison name (for naming output files)
 comp_name <- args[1]
 
-#"PatientPost_v_ControlPost"
 
 setwd(paste0("data/dmr/",args[1]))
 
@@ -35,7 +29,7 @@ setwd(paste0("data/dmr/",args[1]))
 
 # make a TxDB object from the annotation gtf file
 txdb <- makeTxDbFromGFF(gtf_file,
-  format="gtf", "GRCh38.103", "Homo sapiens")
+  format="gtf", args[6], args[5])
 
 # read in DMR results to annotate
 mydat <- makeGRangesFromDataFrame(read.delim(sig_dmrs_txt, header=T),

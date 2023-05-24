@@ -196,9 +196,14 @@ rule chipseeker:
     conda:
         "envs/chipseeker.yaml" #create this yaml
     params:
-        comparisons = expand("{comparison}", comparison = config["comparisons"])
+        comparisons = expand("{comparison}", comparison = config["comparisons"]),
+        gtf_file = config["gtf_file"],
+        gene_info_file = config["gene_info_file"],
+        organism = config["organism"],
+        ref_genome = config["ref_genome"]
+
     shell:
-        "Rscript run_chipseeker.R {params.comparisons} {input.dmrs}"
+        "Rscript run_chipseeker.R {params.comparisons} {input.dmrs} {params.gtf_file} {params.gene_info_file} {params.organism} {params.ref_genome}"
 
 rule homer:
     input:
@@ -210,6 +215,6 @@ rule homer:
     params:
         inpath = "data"
     shell:
-        "scrips/run_homer_findMotifsGenome.sh {params.inpath}"
+        "scripts/run_homer_findMotifsGenome.sh {params.inpath}"
 
 

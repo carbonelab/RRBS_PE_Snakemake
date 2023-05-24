@@ -1,7 +1,16 @@
 # Config File
 
 gtf_file:
-  /home/groups/hoolock2/myfile.gtf
+  /home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly/annotation/Homo_sapiens.GRCh38.103.gtf
+
+gene_info_file:
+  /home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly/annotation/GRCh38.103.gene_info.txt
+
+organism:
+  homo sapiens
+
+ref_genome:
+  GRCh38.103
 
 bismark_ref_genome:
   /home/groups/hoolock2/u0/genomes/ensembl/homo_sapiens/primary_assembly
