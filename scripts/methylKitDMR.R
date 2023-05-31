@@ -38,18 +38,40 @@ setwd(args[3])
 
 #Wrapper script generates the information below:
 
+#reorganize() helper function
+	#function to create object of sample names
+		#need group info
+	#function to create treatment vector 
+		#need group sizes
+
+#vector of the two group IDs to be compared
+groups <- c(1,2)
+reorganizedSamples <- NULL
+
+#loop over all samples in the sample file
+for(sample in samples) {
+	#add sample to vector for reorganization 
+	if(sample[2] == groups[0]) {
+		reorganizedSamples <- append(reorganizedSamples, sample)
+	}
+	else if(sample[2] == groups[1]) {
+		reorganizedSamples <- append(reorganizedSamples, sample)
+	}
+}
+
+
 c1 <- reorganize(meth,
-		sample.ids=c("UMN_1_1","UMN_3_1","UMN_5_1","UMN_7_1","UMN_11_1","UMN_1_10","UMN_5_10","UMN_3_10","UMN_7_10","UMN_11_12"),
-		treatment=c(0,0,0,0,0,1,1,1,1,1)
+		sample.ids=getList(reorganizedSamples[,c(1)]),
+		treatment=getTreatmentVector(reorganizedSamples[,c(2)])
 ) 
 
-covariates1 <- data.frame(individual = c("1","3","5","7","11","1","5","3","7","11"))
+#pass in comparison name 
 
 res1 <- calc.DMRs(c1,
-		covariate=covariates1,
+		covariate=NULL,
 		overdispersion="MN",
 		test="Chisq",
-		comparison="PatientPre_v_PatientPost",
+		comparison=args[3],
 		meth.diff=10,
 		qval=0.1,
 		type="DMR",
@@ -58,4 +80,4 @@ res1 <- calc.DMRs(c1,
 
 #error handling here to prevent job failure
 
-makeBED(res1,"PatientPre_v_PatientPost","DMR")
+makeBED(res1,args[3],"DMR")
